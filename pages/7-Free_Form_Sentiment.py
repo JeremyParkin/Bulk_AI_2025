@@ -86,14 +86,30 @@ if st.button("Analyze Stories"):
         # Ensure progress bar reaches 100%
         progress_bar.progress(1.0)
 
+    # # Add the analysis results to the DataFrame
+    # df['AI Sentiment'] = responses
+    #
+    # # Update the 'AI Sentiment' column in st.session_state.unique_stories
+    # for _, row in df.iterrows():
+    #     st.session_state.unique_stories.loc[
+    #         st.session_state.unique_stories['Group ID'] == row['Group ID'], 'AI Sentiment'
+    #     ] = row['AI Sentiment']
+
     # Add the analysis results to the DataFrame
     df['AI Sentiment'] = responses
 
-    # Update the 'AI Sentiment' column in st.session_state.unique_stories
+    # Split 'AI Sentiment' into 'AI Sentiment' and 'AI Sentiment Rationale' if a colon is present
+    df[['AI Sentiment', 'AI Sentiment Rationale']] = df['AI Sentiment'].str.split(':', 1, expand=True)
+
+    # Update the 'AI Sentiment' and 'AI Sentiment Rationale' columns in st.session_state.unique_stories
     for _, row in df.iterrows():
         st.session_state.unique_stories.loc[
             st.session_state.unique_stories['Group ID'] == row['Group ID'], 'AI Sentiment'
         ] = row['AI Sentiment']
+        st.session_state.unique_stories.loc[
+            st.session_state.unique_stories['Group ID'] == row['Group ID'], 'AI Sentiment Rationale'
+        ] = row['AI Sentiment Rationale']
+
 
     end_time = time.time()
     elapsed_time = end_time - start_time
