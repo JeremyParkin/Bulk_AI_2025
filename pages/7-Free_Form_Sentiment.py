@@ -104,8 +104,11 @@ if st.button("Analyze Stories"):
     # Ensure 'AI Sentiment' column contains only strings
     df['AI Sentiment'] = df['AI Sentiment'].astype(str)
 
+    # df['AI Sentiment'] = df['AI Sentiment'].astype(str)
+
     # Split 'AI Sentiment' into 'AI Sentiment' and 'AI Sentiment Rationale' if a colon is present
-    df[['AI Sentiment', 'AI Sentiment Rationale']] = df['AI Sentiment'].str.split(':', 1, expand=True)
+    # df[['AI Sentiment', 'AI Sentiment Rationale']] = df['AI Sentiment'].str.split(':', 1, expand=True)
+    df[['AI Sentiment', 'AI Sentiment Rationale']] = df['AI Sentiment'].str.split(':', n=1, expand=True)
 
     # Update the 'AI Sentiment' and 'AI Sentiment Rationale' columns in st.session_state.unique_stories
     for _, row in df.iterrows():
