@@ -17,7 +17,94 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("MIG Freeform Sentiment")
+st.title("MIG Structured Sentiment")
+
+
+###############################
+
+
+import streamlit as st
+
+# App Title
+st.title("AI Sentiment Analysis Prompt Builder")
+
+# Layout: Two columns
+col1, col2 = st.columns(2)
+
+# Left Column: User Inputs
+with col1:
+    st.header("Input Parameters")
+
+    # Named Entity
+    named_entity = st.text_input("Named Entity", placeholder="Enter the primary entity to analyze (e.g., Apple Inc.)")
+
+    # Entity Variations
+    entity_variations = st.text_area(
+        "Entity Variations",
+        placeholder="Enter other common variations of the entity name (e.g., Apple, AAPL), separated by commas.",
+        help="List variations of the entity to ensure comprehensive analysis."
+    )
+
+    # Include Explanation
+    include_explanation = st.checkbox(
+        "Include Explanation",
+        value=True,
+        help="Check to include a 1-2 sentence explanation supporting the sentiment classification."
+    )
+
+    # Include Confidence Score
+    include_confidence = st.checkbox(
+        "Include Confidence Score",
+        value=False,
+        help="Check to include the confidence score of the sentiment analysis."
+    )
+
+    # Additional Guidance for Criteria
+    additional_guidance = st.text_area(
+        "Additional Sentiment Criteria",
+        placeholder="Add specific instructions or criteria to guide the sentiment classification.",
+        help="Optional: Provide any additional context or specific points to consider for sentiment evaluation."
+    )
+
+# Right Column: Prompt Preview
+with col2:
+    st.header("Prompt Preview")
+
+    # Generate Prompt
+    prompt = f"""
+    You are an AI trained to perform expert-level sentiment analysis, with a keen awareness of how media stories can impact a brand's reputation. 
+    You will analyze the sentiment of the following news story specifically for how it portrays {named_entity if named_entity else "[Named Entity Not Specified]"}. 
+    Note that {named_entity if named_entity else "[Named Entity Not Specified]"} might be referred to by other common variations such as {entity_variations if entity_variations else "[No Variations Provided]"}. 
+    Focus on how the organization is portrayed using the following criteria to guide your analysis:
+
+    POSITIVE: Praises or highlights the {named_entity}'s achievements, contributions, or strengths.
+    NEUTRAL: Provides balanced or factual coverage of the {named_entity} without clear positive or negative framing. Mentions the {named_entity} in a way that is neither supportive nor critical.
+    NEGATIVE: Criticizes, highlights failures, or blames the {named_entity} for challenges or issues.
+
+    {f"Additional Guidance: {additional_guidance}" if additional_guidance else ""}
+
+    Note: Focus your analysis strictly on the sentiment toward {named_entity} rather than the broader topic or context of the story.
+
+    {"Provide a single-word sentiment classification (POSITIVE, NEUTRAL, or NEGATIVE)" +
+     (", followed by a colon and a one to two sentence explanation supporting your assessment." if include_explanation else ".")}
+    {"Include a confidence score for your classification." if include_confidence else ""}
+    If {named_entity} is not mentioned in the story, please reply with the phrase 'NOT RELEVANT'.
+
+    Here is the story:
+    """
+
+    # Display Non-Editable Prompt
+    st.text_area("Generated Prompt", prompt, height=400, disabled=True)
+
+
+
+# Footer
+st.markdown("---")
+st.caption("Customize the inputs to dynamically generate a structured AI prompt for entity sentiment analysis.")
+
+###############################
+
+
 st.header("Custom Prompt:")
 
 # Input custom prompt
@@ -153,10 +240,17 @@ if st.button("Analyze Stories"):
         st.session_state.df_traditional.loc[
             st.session_state.df_traditional['Group ID'] == row['Group ID'], 'AI Sentiment'
         ] = row['AI Sentiment']
+    # st.success("AI Sentiment cascaded to df_traditional successfully.")
 
 # Add buttons for additional functionality
 if st.button("Clear AI Sentiment"):
     st.session_state.unique_stories['AI Sentiment'] = None
     st.success("AI Sentiment column cleared successfully.")
 
+# if st.button("Cascade AI Sentiment to df_traditional"):
+#     for _, row in st.session_state.unique_stories.iterrows():
+#         st.session_state.df_traditional.loc[
+#             st.session_state.df_traditional['Group ID'] == row['Group ID'], 'AI Sentiment'
+#         ] = row['AI Sentiment']
+#     st.success("AI Sentiment cascaded to df_traditional successfully.")
 
