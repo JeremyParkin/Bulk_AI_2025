@@ -37,16 +37,14 @@ else:
         sentiment_counts['Percentage'] = (sentiment_counts['Count'] / total)
 
         if st.session_state.sentiment_type == '5-way':
-            custom_order = ['VERY POSITIVE', 'SOMEWHAT POSITIVE', 'NEUTRAL', 'SOMEWHAT NEGATIVE', 'VERY NEGATIVE', 'NOT RELEVANT', 'IRRELEVANT']
+            custom_order = ['VERY POSITIVE', 'SOMEWHAT POSITIVE', 'NEUTRAL', 'SOMEWHAT NEGATIVE', 'VERY NEGATIVE', 'NOT RELEVANT']
         else:
-            custom_order = ['POSITIVE', 'NEUTRAL', 'NEGATIVE', 'NOT RELEVANT', 'IRRELEVANT']
+            custom_order = ['POSITIVE', 'NEUTRAL', 'NEGATIVE', 'NOT RELEVANT']
 
         # Apply the custom order to 'Assigned Sentiment' in df_traditional
         st.session_state.df_traditional['AI Sentiment'] = pd.Categorical(
             st.session_state.df_traditional['AI Sentiment'], categories=custom_order, ordered=True)
 
-        # Sort the DataFrame
-        # st.session_state.df_traditional.sort_values(by='Assigned Sentiment', ascending=True, inplace=True)
 
         # Ensure all sentiments are in the dataframe (to avoid key errors in sorting)
         for sentiment in custom_order:
