@@ -17,20 +17,23 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("MIG Freeform Sentiment")
-st.header("Custom Prompt:")
+st.title("MIG Freeform Analysis")
+
+
+st.subheader("Custom Prompt Inputs")
+
 
 # Input custom prompt
-custom_prompt = st.text_area("Enter your custom sentiment prompt here:", "")
+custom_prompt = st.text_area("Enter your custom prompt here:", "")
 
 # Row limit input
 row_limit = st.number_input("Limit rows for testing (0 for all rows):", min_value=0, value=0, step=1)
 
 df = st.session_state.unique_stories
 
-# Filter rows without existing AI Sentiment values
-if 'AI Sentiment' in df.columns:
-    df = df[df['AI Sentiment'].isna() | (df['AI Sentiment'].str.len() == 0)]
+# Filter rows without existing AI Analysis values
+if 'Freeform Analysis' in df.columns:
+    df = df[df['Freeform Analysis'].isna() | (df['Freeform Analysis'].str.len() == 0)]
 
 # Apply row limit for the batch
 if row_limit > 0:
@@ -38,7 +41,10 @@ if row_limit > 0:
 
 st.write(f"Total Stories to Analyze: {len(df)}")
 
-if st.button("Analyze Stories"):
+
+
+
+if st.button("Analyze Stories", type='primary'):
     openai.api_key = st.secrets["key"]
     responses = [None] * len(df)  # Initialize a list to store responses
     progress_bar = st.progress(0)  # Initialize the progress bar
@@ -58,7 +64,7 @@ if st.button("Analyze Stories"):
         full_prompt = f"{custom_prompt}\n\n{row['Headline']}. {row[snippet_column]}"
         try:
             response = client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": "You are a highly knowledgeable media analysis AI."},
                     {"role": "user", "content": full_prompt}
@@ -86,38 +92,21 @@ if st.button("Analyze Stories"):
         # Ensure progress bar reaches 100%
         progress_bar.progress(1.0)
 
-    # # Add the analysis results to the DataFrame
-    # df['AI Sentiment'] = responses
-    #
-    # # Update the 'AI Sentiment' column in st.session_state.unique_stories
-    # for _, row in df.iterrows():
-    #     st.session_state.unique_stories.loc[
-    #         st.session_state.unique_stories['Group ID'] == row['Group ID'], 'AI Sentiment'
-    #     ] = row['AI Sentiment']
 
     # Add the analysis results to the DataFrame
-    df['AI Sentiment'] = responses
+    df['Freeform Analysis'] = responses
 
-    # # Split 'AI Sentiment' into 'AI Sentiment' and 'AI Sentiment Rationale' if a colon is present
-    # df[['AI Sentiment', 'AI Sentiment Rationale']] = df['AI Sentiment'].str.split(':', 1, expand=True)
 
-    # Ensure 'AI Sentiment' column contains only strings
-    df['AI Sentiment'] = df['AI Sentiment'].astype(str)
+    # Ensure 'Freeform Analysis' column contains only strings
+    df['Freeform Analysis'] = df['Freeform Analysis'].astype(str)
 
-    # df['AI Sentiment'] = df['AI Sentiment'].astype(str)
 
-    # Split 'AI Sentiment' into 'AI Sentiment' and 'AI Sentiment Rationale' if a colon is present
-    # df[['AI Sentiment', 'AI Sentiment Rationale']] = df['AI Sentiment'].str.split(':', 1, expand=True)
-    df[['AI Sentiment', 'AI Sentiment Rationale']] = df['AI Sentiment'].str.split(':', n=1, expand=True)
-
-    # Update the 'AI Sentiment' and 'AI Sentiment Rationale' columns in st.session_state.unique_stories
+    # Update the 'Freeform Analysis' column in st.session_state.unique_stories
     for _, row in df.iterrows():
         st.session_state.unique_stories.loc[
-            st.session_state.unique_stories['Group ID'] == row['Group ID'], 'AI Sentiment'
-        ] = row['AI Sentiment']
-        st.session_state.unique_stories.loc[
-            st.session_state.unique_stories['Group ID'] == row['Group ID'], 'AI Sentiment Rationale'
-        ] = row['AI Sentiment Rationale']
+            st.session_state.unique_stories['Group ID'] == row['Group ID'], 'Freeform Analysis'
+        ] = row['Freeform Analysis']
+
 
 
     end_time = time.time()
@@ -151,12 +140,73 @@ if st.button("Analyze Stories"):
 
     for _, row in st.session_state.unique_stories.iterrows():
         st.session_state.df_traditional.loc[
-            st.session_state.df_traditional['Group ID'] == row['Group ID'], 'AI Sentiment'
-        ] = row['AI Sentiment']
+            st.session_state.df_traditional['Group ID'] == row['Group ID'], 'Freeform Analysis'
+        ] = row['Freeform Analysis']
 
 # Add buttons for additional functionality
-if st.button("Clear AI Sentiment"):
-    st.session_state.unique_stories['AI Sentiment'] = None
-    st.success("AI Sentiment column cleared successfully.")
+if st.button("Clear Freeform AI Analysis"):
+    st.session_state.unique_stories['Freeform Analysis'] = None
+    st.success("Freeform AI Analysis column cleared successfully.")
 
+with st.expander("Unique Stories"):
+    st.dataframe(st.session_state.unique_stories, hide_index=True)
+
+
+st.divider()
+st.subheader("Custom Prompt Examples")
+st.divider()
+# named_entity = st.text_input("Named Entity", "")
+# if len(named_entity) == 0:
+#     named_entity = "[BRAND]"
+# topic_list = st.text_input("Comma seperated topic List", "")
+# st.write("Update the prompt examples with the appropriate brand names and details for your use case.")
+# st.info(
+#     "NOTE: These prompts are not perfect. They may not even be good. They are just examples to get you started.")
+
+
+named_entity = st.text_input("Named Entity", "")
+if len(named_entity) == 0:
+    named_entity = "[BRAND]"
+topic_list = st.text_input("Comma seperated topic List", "")
+
+
+with st.expander("Product finder"):
+    f"""
+    Please analyze the following story to see if any {named_entity} products appear in it. 
+    If yes, respond with only the list of names. If no, respond with just the word 'No': 
+    """
+
+with st.expander("Spokesperson finder"):
+    f"""
+    Please analyze the following story to see if any {named_entity} spokespeople appear in it. 
+    If yes, respond with only the list of names. If no, respond with just the word 'No': 
+    """
+
+with st.expander("Topic finder"):
+    f"""
+    Please analyze the following story to see if {named_entity} is explicitly associated with any of the following topics in it:
+    [{topic_list}].
+    If yes, respond with only the list of topic names. If no, respond with just the word 'No': 
+    """
+
+with st.expander("Sentiment"):
+    f"""
+    Analyze the sentiment of the following news story toward the {named_entity}. Focus on how the organization is portrayed using the following criteria to guide your analysis:\n
+    POSITIVE: Praises or highlights the {named_entity}'s achievements, contributions, or strengths. 
+    NEUTRAL: Provides balanced or factual coverage of the {named_entity} without clear positive or negative framing. Mentions the {named_entity} in a way that is neither supportive nor critical.
+    NEGATIVE: Criticizes, highlights failures, or blames the {named_entity} for challenges or issues.
+    Note: Focus your analysis strictly on the sentiment toward {named_entity} rather than the broader topic or context of the story. \n
+    Provide a single-word sentiment classification (POSITIVE, NEUTRAL, or NEGATIVE) followed by a colon, then a one to two sentence explanation supporting your assessment. 
+    If {named_entity} is not mentioned in the story, please reply with the phrase "NOT RELEVANT". Here is the story:
+    """
+
+
+with st.expander("Junk checker"):
+    f"""
+    Analyze the following news story or broadcast transcript to determine the type of coverage for the {named_entity}. Your response should be a single label from the following categories:\n
+ - Press Release – The content appears to be directly from a press release or promotional material.\n
+ - Advertisement – The brand mention is part of an advertisement or sponsored content.\n
+ - Legitimate News – The brand is mentioned within a genuine news story or editorial context.\n
+ Reply with only the category label that best fits the coverage.
+    """
 

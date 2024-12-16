@@ -20,7 +20,7 @@ st.set_page_config(
 
 st.title("AI Sentiment Analysis")
 
-st.subheader("With columns for confidence score and rationale")
+st.info("This page will generate three new columns: 'AI Sentiment', 'AI Sentiment Confidence', and 'AI Sentiment Rationale'.")
 if not st.session_state.upload_step:
     st.error('Please upload a CSV before trying this step.')
 
@@ -29,9 +29,9 @@ elif not st.session_state.config_step:
 
 else:
 
-
+    st.subheader("Sentiment Prompt Inputs")
     # Add input for named entity
-    named_entity = st.text_input("**Full brand name for analysis**, e.g. *The Canada Mortgage and Housing Corporation (CHMC)*:", "")
+    named_entity = st.text_input("**Full brand name for analysis**, e.g. *the Canada Mortgage and Housing Corporation (CHMC)*:", "", help='Enter the full brand name for analysis, e.g. *the Canada Mortgage and Housing Corporation (CHMC)*. If appropriate, include "the" before it and/or a common acronym in parentheses after.')
     if named_entity.strip() == "":
         st.warning("Please enter a named entity for analysis.")
 
@@ -70,6 +70,8 @@ else:
 
     st.write(f"Total Stories to Analyze: {len(df)}")
 
+
+
     # Define the function schema for OpenAI
     functions = [
         {
@@ -103,7 +105,7 @@ else:
         }
     ]
 
-    if st.button("Analyze Stories"):
+    if st.button("Analyze Stories", type='primary'):
         if not named_entity:
             st.error("Please provide a named entity for analysis.")
         else:
