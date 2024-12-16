@@ -26,8 +26,10 @@ st.subheader("Custom Prompt Inputs")
 # Input custom prompt
 custom_prompt = st.text_area("Enter your custom prompt here:", "")
 
-# Row limit input
-row_limit = st.number_input("Limit rows for testing (0 for all rows):", min_value=0, value=0, step=1)
+col1, col2 = st.columns(2)
+with col1:
+    # Row limit input
+    row_limit = st.number_input("Limit rows for testing (0 for all rows):", min_value=0, value=0, step=1)
 
 df = st.session_state.unique_stories
 
@@ -35,11 +37,16 @@ df = st.session_state.unique_stories
 if 'Freeform Analysis' in df.columns:
     df = df[df['Freeform Analysis'].isna() | (df['Freeform Analysis'].str.len() == 0)]
 
+
 # Apply row limit for the batch
 if row_limit > 0:
     df = df.iloc[:row_limit]  # Select only the next batch of rows
 
 st.write(f"Total Stories to Analyze: {len(df)}")
+
+
+with col2:
+    model = st.selectbox("Select Model", ["gpt-4o-mini", "gpt-4o"])
 
 
 
@@ -64,7 +71,7 @@ if st.button("Analyze Stories", type='primary'):
         full_prompt = f"{custom_prompt}\n\n{row['Headline']}. {row[snippet_column]}"
         try:
             response = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=model,
                 messages=[
                     {"role": "system", "content": "You are a highly knowledgeable media analysis AI."},
                     {"role": "user", "content": full_prompt}

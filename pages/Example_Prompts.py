@@ -21,20 +21,20 @@ st.info("NOTE: These prompts are not perfect. They may not even be good. They ar
 with st.expander("Product finder"):
     f"""
     Please analyze the following story to see if any {named_entity} products appear in it. 
-    If yes, respond with only the list of names. If no, respond with just the word 'No': 
+    If yes, respond with only the list of names. If no, respond with just the word NO. Here is the story: 
     """
 
 with st.expander("Spokesperson finder"):
     f"""
     Please analyze the following story to see if any {named_entity} spokespeople appear in it. 
-    If yes, respond with only the list of names. If no, respond with just the word 'No': 
+    If yes, respond with only the list of names. If no, respond with just the word NO. Here is the story: 
     """
 
 with st.expander("Topic finder"):
     f"""
     Please analyze the following story to see if {named_entity} is explicitly associated with any of the following topics in it:
     [{topic_list}].
-    If yes, respond with only the list of topic names. If no, respond with just the word 'No': 
+    If yes, respond with only the list of topic names. If no, respond with just the word NO. Here is the story: 
     """
 
 with st.expander("Sentiment"):
@@ -60,8 +60,8 @@ with st.expander("Sentiment"):
 with st.expander("Junk checker"):
     f"""
     Analyze the following news story or broadcast transcript to determine the type of coverage for the {named_entity}. Your response should be a single label from the following categories:\n
- - Press Release – The content appears to be directly from a press release or promotional material.\n
- - Advertisement – The brand mention is part of an advertisement or sponsored content.\n
- - Legitimate News – The brand is mentioned within a genuine news story or editorial context.\n
- Reply with only the category label that best fits the coverage.
+     - Press Release – The content appears to be directly from a press release or promotional material.\n
+     - Advertisement – The brand mention is part of an advertisement or sponsored content.\n
+     - Legitimate News – The brand is mentioned within a genuine news story or editorial context.\n
+     Reply with only the category label that best fits the coverage.
     """
