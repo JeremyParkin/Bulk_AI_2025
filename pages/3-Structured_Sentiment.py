@@ -20,14 +20,15 @@ st.set_page_config(
 
 st.title("AI Sentiment Analysis")
 
-st.info("This page will generate three new columns: 'AI Sentiment', 'AI Sentiment Confidence', and 'AI Sentiment Rationale'.")
 if not st.session_state.upload_step:
-    st.error('Please upload a CSV before trying this step.')
+    st.error('Please upload a CSV/XLSX before trying this step.')
 
 elif not st.session_state.config_step:
     st.error('Please run the configuration step before trying this step.')
 
 else:
+    st.info(
+        "This page will generate three new columns: 'AI Sentiment', 'AI Sentiment Confidence', and 'AI Sentiment Rationale'.")
 
     st.subheader("Sentiment Prompt Inputs")
     # Add input for named entity
