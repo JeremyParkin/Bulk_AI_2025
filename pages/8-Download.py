@@ -24,7 +24,7 @@ if st.session_state.get('current_page') != 'Download':
 st.session_state.current_page = 'Download'
 
 if not st.session_state.upload_step:
-    st.error('Please upload a CSV before trying this step.')
+    st.error('Please upload a CSV/XLSX before trying this step.')
 elif not st.session_state.config_step:
     st.error('Please run the configuration step before trying this step.')
 else:
