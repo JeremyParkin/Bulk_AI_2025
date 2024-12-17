@@ -19,9 +19,10 @@ with col1:
 with col2:
     topic_list = st.text_input("Comma separated topic List", "")
 
-st.info("NOTE: These prompts are not perfect. They may not even be good. They are just examples to get you started.")
 
 st.subheader("Prompt Examples")
+st.info("NOTE: These prompts are not perfect. They may not even be good. They are just examples to get you started.")
+
 
 with st.expander("Product finder"):
     f"""
