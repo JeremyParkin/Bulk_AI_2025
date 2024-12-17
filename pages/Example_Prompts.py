@@ -7,7 +7,7 @@ st.set_page_config(page_title="MIG Freeform Analysis Tool",
                    layout="wide")
 
 
-st.header("Prompt Examples")
+st.header("Example Prompts")
 
 st.subheader("Custom Prompt Inputs")
 col1, col2 = st.columns(2)
