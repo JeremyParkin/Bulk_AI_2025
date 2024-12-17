@@ -17,7 +17,7 @@ with col1:
         named_entity = "[BRAND]"
 
 with col2:
-    topic_list = st.text_input("Comma separated topic List", "")
+    topic_list = st.text_input("Comma separated topic List", "", help="Only needed for Topic finder prompt")
 
 
 st.subheader("Prompt Examples")
