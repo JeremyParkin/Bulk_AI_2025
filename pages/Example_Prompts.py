@@ -9,7 +9,7 @@ st.set_page_config(page_title="MIG Freeform Analysis Tool",
 
 st.header("Example Prompts")
 
-st.subheader("Custom Prompt Inputs")
+st.subheader("Custom Prompt Inputs", help="Customize the prompts with a specific brand name (and if needed, a list of relevant topics)")
 col1, col2 = st.columns(2)
 with col1:
     named_entity = st.text_input("Brand name for prompts", "")
