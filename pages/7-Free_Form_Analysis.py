@@ -166,7 +166,10 @@ else:
     with st.expander("Unique Stories"):
         st.dataframe(st.session_state.unique_stories, hide_index=True)
 
+    st.divider()
     st.header("Example Prompts")
+    st.info(
+        "NOTE: These prompts are not perfect. They may not even be good. They are just examples to get you started.")
 
     st.subheader("Custom Prompt Inputs",
                  help="Customize the prompts with a specific brand name (and if needed, a list of relevant topics)")
@@ -180,8 +183,7 @@ else:
         topic_list = st.text_input("Comma separated topic List", "", help="Only needed for Topic finder prompt")
 
     st.subheader("Prompt Examples")
-    st.info(
-        "NOTE: These prompts are not perfect. They may not even be good. They are just examples to get you started.")
+
 
     with st.expander("Product finder"):
         f"""
