@@ -102,6 +102,7 @@ def cluster_similar_stories(df, similarity_threshold=0.85):
     return df
 
 
+
 def cluster_by_media_type(df, similarity_threshold=0.92):
     """Cluster stories by media type and ensure unique Group IDs across media types."""
     type_column = 'Media Type' if 'Media Type' in df.columns else 'Type'
@@ -132,12 +133,17 @@ def cluster_by_media_type(df, similarity_threshold=0.92):
             media_df['Normalized Headline'] = media_df['Headline'].apply(normalize_text)
             media_df['Normalized Snippet'] = media_df['Snippet'].apply(normalize_text)
 
-            # Cluster stories for this media type
-            media_df = cluster_similar_stories(media_df, similarity_threshold=similarity_threshold)
+            if len(media_df) == 1:
+                # Assign a unique Group ID to the single row
+                media_df['Group ID'] = group_id_offset
+                group_id_offset += 1
+            else:
+                # Cluster stories for this media type
+                media_df = cluster_similar_stories(media_df, similarity_threshold=similarity_threshold)
 
-            # Offset Group IDs to make them unique
-            media_df['Group ID'] += group_id_offset
-            group_id_offset += media_df['Group ID'].max() + 1
+                # Offset Group IDs to make them unique
+                media_df['Group ID'] += group_id_offset
+                group_id_offset += media_df['Group ID'].max() + 1
 
             # Drop normalized columns
             normalized_columns = [col for col in ['Normalized Headline', 'Normalized Snippet'] if
@@ -148,6 +154,54 @@ def cluster_by_media_type(df, similarity_threshold=0.92):
 
     # Combine all clustered frames
     return pd.concat(clustered_frames, ignore_index=True) if clustered_frames else df
+
+
+# def cluster_by_media_type(df, similarity_threshold=0.92):
+#     """Cluster stories by media type and ensure unique Group IDs across media types."""
+#     type_column = 'Media Type' if 'Media Type' in df.columns else 'Type'
+#
+#     # Identify unique media types
+#     unique_media_types = df[type_column].unique()
+#
+#     clustered_frames = []
+#     group_id_offset = 0  # Offset to ensure unique Group IDs across media types
+#
+#     for media_type in unique_media_types:
+#         st.write(f"Processing media type: {media_type}")
+#
+#         # Filter data for the current media type
+#         media_df = df[df[type_column] == media_type].copy()
+#
+#         if not media_df.empty:
+#             # Fill missing Headline/Snippet with empty strings
+#             media_df['Headline'] = media_df['Headline'].fillna("")
+#             media_df['Snippet'] = media_df['Snippet'].fillna("")
+#
+#             # Skip processing if all headlines and snippets are empty
+#             if media_df[['Headline', 'Snippet']].apply(lambda x: x.str.strip()).eq("").all(axis=None):
+#                 st.warning(f"Skipping media type {media_type} due to missing headlines and snippets.")
+#                 continue
+#
+#             # Normalize and clean text
+#             media_df['Normalized Headline'] = media_df['Headline'].apply(normalize_text)
+#             media_df['Normalized Snippet'] = media_df['Snippet'].apply(normalize_text)
+#
+#             # Cluster stories for this media type
+#             media_df = cluster_similar_stories(media_df, similarity_threshold=similarity_threshold)
+#
+#             # Offset Group IDs to make them unique
+#             media_df['Group ID'] += group_id_offset
+#             group_id_offset += media_df['Group ID'].max() + 1
+#
+#             # Drop normalized columns
+#             normalized_columns = [col for col in ['Normalized Headline', 'Normalized Snippet'] if
+#                                   col in media_df.columns]
+#             media_df = media_df.drop(columns=normalized_columns, errors='ignore')
+#
+#             clustered_frames.append(media_df)
+#
+#     # Combine all clustered frames
+#     return pd.concat(clustered_frames, ignore_index=True) if clustered_frames else df
 
 
 def assign_group_ids(duplicates):
@@ -226,6 +280,7 @@ else:
 
         else:
             st.session_state.sample_size = len(st.session_state.full_dataset)
+            st.write(f"Full data size: {st.session_state.sample_size}")
 
         similarity_threshold = 0.93
         st.session_state.similarity_threshold = similarity_threshold
