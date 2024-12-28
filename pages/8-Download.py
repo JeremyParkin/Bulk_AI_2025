@@ -142,6 +142,9 @@ else:
 
     with st.expander('View Processed Data'):
         st.dataframe(st.session_state.df_traditional)
+        # st.dataframe(st.session_state.df_traditional.loc[:,
+        #              ~st.session_state.df_traditional.columns.isin(["FF_Processed", "Processed"])])
+
 
     traditional = st.session_state.df_traditional
 

@@ -32,6 +32,7 @@ else:
         "This page will generate three new columns: 'AI Sentiment', 'AI Sentiment Confidence', and 'AI Sentiment Rationale'.")
 
     st.subheader("Sentiment Prompt Inputs")
+
     # Add input for named entity
     named_entity = st.text_input("**Full brand name for analysis**, e.g. *the Canada Mortgage and Housing Corporation (CHMC)*:", "", help='Enter the full brand name for analysis, e.g. *the Canada Mortgage and Housing Corporation (CHMC)*. If appropriate, include "the" before it and/or a common acronym in parentheses after.')
     if named_entity.strip() == "":
@@ -225,7 +226,7 @@ else:
             total_input_tokens = token_counts['input_tokens']
             total_output_tokens = token_counts['output_tokens']
             input_cost = (total_input_tokens / 1_000_000) * 2.50  # Cost for input tokens
-            output_cost = (total_output_tokens / 1_000_000) * 1.25  # Cost for output tokens
+            output_cost = (total_output_tokens / 1_000_000) * 10  # Cost for output tokens
             total_cost = input_cost + output_cost
 
             st.markdown(
@@ -233,6 +234,13 @@ else:
                 unsafe_allow_html=True
             )
             st.write(f"**Total Cost:** USD${total_cost:.4f}")
+
+            for _, row in st.session_state.unique_stories.iterrows():
+                st.session_state.df_traditional.loc[
+                st.session_state.df_traditional['Group ID'] == row['Group ID'], ['AI Sentiment', 'AI Sentiment Confidence', 'AI Sentiment Rationale']
+                ] = row[['AI Sentiment', 'AI Sentiment Confidence', 'AI Sentiment Rationale']].values
+
+
 
     # Add button to reset processed state
     if st.button("Reset Processed Rows"):

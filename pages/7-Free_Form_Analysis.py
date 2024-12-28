@@ -3,6 +3,8 @@ import pandas as pd
 import openai
 import io
 import concurrent.futures
+from concurrent.futures import as_completed
+
 from openai import OpenAI
 import time
 from threading import Lock
@@ -26,140 +28,298 @@ elif not st.session_state.config_step:
     st.error('Please run the configuration step before trying this step.')
 
 else:
-
+    st.info(
+        "This page allows you to write your own prompt for any purpose you can imagine. Test carefully. Example prompts below.")
 
     st.subheader("Custom Prompt Inputs")
 
-
     # Input custom prompt
     custom_prompt = st.text_area("Enter your custom prompt here:", "")
+
+    # Ensure the "FF_Processed" column exists
+    if "FF_Processed" not in st.session_state.unique_stories.columns:
+        st.session_state.unique_stories["FF_Processed"] = False
+
+    # Inputs for start row and batch size
+    start_row = 0
+
 
     col1, col2 = st.columns(2)
     with col1:
         # Row limit input
         row_limit = st.number_input("Limit rows for testing (0 for all rows):", min_value=0, value=0, step=1)
 
-    df = st.session_state.unique_stories
+    # Filter unprocessed rows
+    unprocessed_df = st.session_state.unique_stories[~st.session_state.unique_stories["FF_Processed"]]
 
-    # Filter rows without existing AI Analysis values
-    if 'Freeform Analysis' in df.columns:
-        df = df[df['Freeform Analysis'].isna() | (df['Freeform Analysis'].str.len() == 0)]
-
-
-    # Apply row limit for the batch
+    # Apply row limits
     if row_limit > 0:
-        df = df.iloc[:row_limit]  # Select only the next batch of rows
+        unprocessed_df = unprocessed_df.iloc[start_row:start_row + row_limit]
+    else:
+        unprocessed_df = unprocessed_df.iloc[start_row:]
 
-    st.write(f"Total Stories to Analyze: {len(df)}")
+
+    # Reset the index of the filtered DataFrame for proper indexing
+    unprocessed_df = unprocessed_df.reset_index()  # Reset index to avoid mismatches
+
+    st.write(f"Selected Stories for Analysis: {len(unprocessed_df)}")
 
 
     with col2:
         model = st.selectbox("Select Model", ["gpt-4o-mini", "gpt-4o"])
 
-
-
-
     if st.button("Analyze Stories", type='primary'):
-        openai.api_key = st.secrets["key"]
-        responses = [None] * len(df)  # Initialize a list to store responses
-        progress_bar = st.progress(0)  # Initialize the progress bar
-        total_stories = len(df)
+        if not custom_prompt:
+            st.error("Please enter a custom prompt before proceeding.")
+            # st.stop()
+        elif len(unprocessed_df) == 0:
+            st.success("All stories have been analyzed.")
+            # st.stop()
+        else:
+            # Initialize lock
+            lock = Lock()
 
-        token_counts = {"input_tokens": 0, "output_tokens": 0}  # Track token usage
-        progress = {"completed": 0}  # Track progress
-        lock = Lock()  # Thread-safe lock
-        start_time = time.time()
+            # Initialize responses and progress tracking
+            responses = [{} for _ in range(len(unprocessed_df))]
+            progress = {"completed": 0}
+            progress_bar = st.progress(0)
+            token_counts = {"input_tokens": 0, "output_tokens": 0}
+            start_time = time.time()
 
-        def update_progress():
-            with lock:
-                progress["completed"] += 1
+            # Define a simplified function schema for OpenAI
+            functions = [
+                {
+                    "name": "analyze_freeform",
+                    "description": "Perform freeform analysis based on a user-defined prompt.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "analysis": {
+                                "type": "string",
+                                "description": "The result of the analysis based on the user's custom prompt."
+                            }
+                        },
+                        "required": ["analysis"]
+                    }
+                }
+            ]
+            #
+            # functions = [
+            #     {
+            #         "name": "analyze_freeform",
+            #         "description": "Perform freeform analysis based on a user-defined prompt.",
+            #         "parameters": {
+            #             "type": "object",
+            #             "properties": {
+            #                 "analysis": {
+            #                     "type": "string",
+            #                     "description": "The result of the analysis based on the user's custom prompt."
+            #                 }
+            #             },
+            #             "required": ["analysis"]
+            #         }
+            #     }
+            # ]
 
-        def analyze_story(row, index):
-            snippet_column = "Coverage Snippet" if "Coverage Snippet" in df.columns else "Snippet"
-            full_prompt = f"{custom_prompt}\n\n{row['Headline']}. {row[snippet_column]}"
-            try:
-                response = client.chat.completions.create(
-                    model=model,
-                    messages=[
-                        {"role": "system", "content": "You are a highly knowledgeable media analysis AI."},
-                        {"role": "user", "content": full_prompt}
-                    ]
-                )
-                with lock:
-                    responses[index] = response.choices[0].message.content.strip()
-                    token_counts["input_tokens"] += response.usage.prompt_tokens
-                    token_counts["output_tokens"] += response.usage.completion_tokens
-            except openai.OpenAIError as e:
-                with lock:
-                    responses[index] = f"Error: {e}"
-            update_progress()
 
-        # Use ThreadPoolExecutor for parallel processing
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            future_to_index = {executor.submit(analyze_story, row, i): i for i, row in df.iterrows()}
+            def analyze_story(row):
+                snippet_column = "Coverage Snippet" if "Coverage Snippet" in unprocessed_df.columns else "Snippet"
+                full_prompt = f"{custom_prompt}\n\n{row['Headline']}. {row[snippet_column]}"
 
-            # Monitor progress
-            while progress["completed"] < total_stories:
-                completed = progress["completed"]
-                progress_bar.progress(completed / total_stories)
-                time.sleep(0.1)
+                try:
+                    response = client.chat.completions.create(
+                        model=model,
+                        messages=[
+                            {"role": "system", "content": "You are a highly adaptable AI for analyzing media."},
+                            {"role": "user", "content": full_prompt}
+                        ],
+                        functions=functions,
+                        function_call={"name": "analyze_freeform"}  # Explicitly call the function
+                    )
+
+                    # Log the raw response for debugging
+                    # st.write(f"API Response: {response}")
+
+                    if response.choices[0].message.function_call:
+                        import json
+                        function_args = json.loads(response.choices[0].message.function_call.arguments)
+
+                        with lock:
+                            token_counts["input_tokens"] += response.usage.prompt_tokens
+                            token_counts["output_tokens"] += response.usage.completion_tokens
+
+
+                        return {"analysis": function_args["analysis"]}
+
+                except Exception as e:
+                    return {"error": str(e)}
+
+                return {"error": "No response received or analysis failed."}
+
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+                futures = {executor.submit(analyze_story, row): idx for idx, row in unprocessed_df.iterrows()}
+                for future in as_completed(futures):
+                    idx = futures[future]
+                    try:
+                        result = future.result()
+                        original_index = unprocessed_df.loc[idx, 'index']  # Map back to the original index
+
+                        with lock:  # Thread-safe updates
+                            if "error" not in result:
+                                st.session_state.unique_stories.loc[original_index, 'Freeform Analysis'] = result[
+                                    "analysis"]
+                                st.session_state.unique_stories.loc[original_index, 'FF_Processed'] = True
+                            else:
+                                st.session_state.unique_stories.loc[
+                                    original_index, 'Freeform Analysis'] = f"Error: {result['error']}"
+
+                            # if "error" not in result:
+                            #     st.session_state.unique_stories.loc[original_index, 'Freeform Analysis'] = result[
+                            #         "analysis"]
+                            #     st.session_state.unique_stories.loc[original_index, 'FF_Processed'] = True
+                            # else:
+                            #     st.session_state.unique_stories.loc[
+                            #         original_index, 'Freeform Analysis'] = f"Error: {result['error']}"
+
+                        with lock:
+                            progress["completed"] += 1
+                            progress_bar.progress(progress["completed"] / len(unprocessed_df))
+
+                    except Exception as exc:
+                        st.error(f"An error occurred: {exc}")
 
             # Ensure progress bar reaches 100%
             progress_bar.progress(1.0)
 
+            # def analyze_story(row):
+            #     snippet_column = "Coverage Snippet" if "Coverage Snippet" in unprocessed_df.columns else "Snippet"
+            #
+            #     full_prompt = f"{custom_prompt}\n\n{row['Headline']}. {row[snippet_column]}"
+            #     try:
+            #         response = client.chat.completions.create(
+            #             model=model,
+            #             messages=[
+            #                 {"role": "system", "content": "You are a highly knowledgeable media analysis AI."},
+            #                 {"role": "user", "content": full_prompt}
+            #             ]
+            #         )
+            #
+            #         # import json
+            #         # function_args = json.loads(response.choices[0].message.function_call.arguments)
+            #
+            #
+            #         if response is None:
+            #             return {"error": "No response received."}
+            #
+            #         with lock:
+            #             token_counts["input_tokens"] += response.usage.prompt_tokens
+            #             token_counts["output_tokens"] += response.usage.completion_tokens
+            #
+            #         return {
+            #             response
+            #         }
+            #     except Exception as e:
+            #         return {"error": str(e)}
 
-        # Add the analysis results to the DataFrame
-        df['Freeform Analysis'] = responses
 
 
-        # Ensure 'Freeform Analysis' column contains only strings
-        df['Freeform Analysis'] = df['Freeform Analysis'].astype(str)
+            # # Use ThreadPoolExecutor for parallel processing
+            # with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            #     futures = {executor.submit(analyze_story, row): idx for idx, row in unprocessed_df.iterrows()}
+            #     for future in as_completed(futures):
+            #         idx = futures[future]
+            #         try:
+            #             result = future.result()
+            #             original_index = unprocessed_df.loc[idx, 'index'] # Map back to the original index
+            #
+            #
+            #             if result is None:
+            #                 st.error("No response received.")
+            #                 continue
+            #
+            #
+            #             with lock: # Thread-safe updates
+            #                 if "error" not in result:
+            #                     st.session_state.unique_stories.loc[
+            #                         original_index, 'Freeform Analysis'] = result.choices[0].message.content.strip()
+            #                     st.session_state.unique_stories.loc[
+            #                         original_index, 'FF_Processed'] = True
+            #
+            #                 else:
+            #                     st.session_state.unique_stories.loc[
+            #                         original_index, 'Freeform Analysis'
+            #                     ] = f"Error: {result['error']}"
+            #
+            #             with lock:
+            #                 progress["completed"] += 1
+            #                 progress_bar.progress(progress["completed"] / len(unprocessed_df))
+            #
+            #         except Exception as exc:
+            #             st.error(f"An error occurred: {exc}")
+            #
+            #
+            #     # Ensure progress bar reaches 100%
+            #     progress_bar.progress(1.0)
 
 
-        # Update the 'Freeform Analysis' column in st.session_state.unique_stories
-        for _, row in df.iterrows():
-            st.session_state.unique_stories.loc[
-                st.session_state.unique_stories['Group ID'] == row['Group ID'], 'Freeform Analysis'
-            ] = row['Freeform Analysis']
+            # Add the analysis results to the DataFrame
+            unprocessed_df['Freeform Analysis'] = responses
+
+            # Ensure 'Freeform Analysis' column contains only strings
+            unprocessed_df['Freeform Analysis'] = unprocessed_df['Freeform Analysis'].astype(str)
 
 
+            # Display results
+            st.markdown(
+                f"**Stories Analyzed:** {len(unprocessed_df)}") # &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Time Taken:** {elapsed_time:.2f} seconds",
+                # unsafe_allow_html=True )
 
-        end_time = time.time()
-        elapsed_time = end_time - start_time
+            # Determine the snippet column name dynamically
+            snippet_column = "Coverage Snippet" if "Coverage Snippet" in st.session_state.unique_stories.columns else "Snippet"
 
-        # Display results
-        st.markdown(
-            f"**Stories Analyzed:** {total_stories} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Time Taken:** {elapsed_time:.2f} seconds",
-            unsafe_allow_html=True
-        )
-        st.dataframe(df)
+            # Display the DataFrame with the selected snippet column
+            (st.dataframe(
+                st.session_state.unique_stories[['Headline', snippet_column, 'Freeform Analysis']]))
+            # ,)
+            #     hide_index=True
+            # )
 
-        # Display token usage
-        st.markdown(
-            f"**Total Input Tokens:** {token_counts['input_tokens']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Total Output Tokens:** {token_counts['output_tokens']}",
-            unsafe_allow_html=True
-        )
+            # st.dataframe(st.session_state.unique_stories[['Headline', 'Freeform Analysis']], hide_index=True)
 
-        # Calculate and display costs
-        total_input_tokens = token_counts['input_tokens']
-        total_output_tokens = token_counts['output_tokens']
-        input_cost = (total_input_tokens / 1_000_000) * 2.50  # Cost for input tokens
-        output_cost = (total_output_tokens / 1_000_000) * 1.25  # Cost for output tokens
-        total_cost = input_cost + output_cost
+            # Display token usage
+            st.markdown(
+                f"**Total Input Tokens:** {token_counts['input_tokens']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Total Output Tokens:** {token_counts['output_tokens']}",
+                unsafe_allow_html=True
+            )
 
-        st.markdown(
-            f"**Cost for Input Tokens:** USD\${input_cost:.4f} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Cost for Output Tokens:** USD\${output_cost:.4f}",
-            unsafe_allow_html=True
-        )
-        st.write(f"**Total Cost:** USD${total_cost:.4f}")
+            # Calculate and display costs
+            total_input_tokens = token_counts['input_tokens']
+            total_output_tokens = token_counts['output_tokens']
 
-        for _, row in st.session_state.unique_stories.iterrows():
-            st.session_state.df_traditional.loc[
-                st.session_state.df_traditional['Group ID'] == row['Group ID'], 'Freeform Analysis'
-            ] = row['Freeform Analysis']
+            # model = st.selectbox("Select Model", ["gpt-4o-mini", "gpt-4o"])
+            if model == "gpt-4o":
+                input_cost = (total_input_tokens / 1_000_000) * 2.50  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 10  # Cost for output tokens
+            else:
+                input_cost = (total_input_tokens / 1_000_000) * 0.15  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 0.60  # Cost for output tokens
+            total_cost = input_cost + output_cost
+
+            st.markdown(
+                f"**Cost for Input Tokens:** USD\${input_cost:.4f} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Cost for Output Tokens:** USD\${output_cost:.4f}",
+                unsafe_allow_html=True
+            )
+            st.write(f"**Total Cost:** USD${total_cost:.4f}")
+
+            for _, row in st.session_state.unique_stories.iterrows():
+                st.session_state.df_traditional.loc[
+                    st.session_state.df_traditional['Group ID'] == row['Group ID'], 'Freeform Analysis'
+                ] = row['Freeform Analysis']
 
     # Add buttons for additional functionality
     if st.button("Clear Freeform AI Analysis"):
+        st.session_state.unique_stories['FF_Processed'] = False
         st.session_state.unique_stories['Freeform Analysis'] = None
         st.success("Freeform AI Analysis column cleared successfully.")
 
@@ -175,7 +335,7 @@ else:
                  help="Customize the prompts with a specific brand name (and if needed, a list of relevant topics)")
     col1, col2 = st.columns(2)
     with col1:
-        named_entity = st.text_input("Brand name for prompts", "")
+        named_entity = st.text_input("Brand name for prompts", f"{st.session_state.client_name}")
         if len(named_entity) == 0:
             named_entity = "[BRAND]"
 
@@ -187,38 +347,39 @@ else:
 
     with st.expander("Product finder"):
         f"""
-        Please analyze the following story to see if any {named_entity} products appear in it. 
-        If yes, respond with only the list of names. If no, respond with just the word NO. Here is the story: 
+        Please analyze the following story to see if any {named_entity} products appear in it.
+        If yes, respond with the list of product names separated by commas, and nothing else. If no, respond with just the word NO. Here is the story:
         """
 
     with st.expander("Spokesperson finder"):
         f"""
-        Please analyze the following story to see if any {named_entity} spokespeople appear in it. 
-        If yes, respond with only the list of names. If no, respond with just the word NO. Here is the story: 
+        Please analyze the following story to see if any {named_entity} spokespeople appear in it.
+        If yes, respond with the list of their full names separated by commas, and nothing else. If no, respond with just the word NO. Here is the story:
         """
+
 
     with st.expander("Topic finder"):
         f"""
         Please analyze the following story to see if {named_entity} is explicitly associated with any of the following topics in it:
         [{topic_list}].
-        If yes, respond with only the list of topic names. If no, respond with just the word NO. Here is the story: 
+        If yes, respond with the list of topic names separated by commas, and nothing else. If no, respond with just the word NO. Here is the story:
         """
 
     with st.expander("Sentiment & rationale"):
         f"""
         Analyze the sentiment of the following news story toward the {named_entity}. Focus on how the organization is portrayed using the following criteria to guide your analysis:\n
-        POSITIVE: Praises or highlights the {named_entity}'s achievements, contributions, or strengths. 
+        POSITIVE: Praises or highlights the {named_entity}'s achievements, contributions, or strengths.
         NEUTRAL: Provides balanced or factual coverage of the {named_entity} without clear positive or negative framing. Mentions the {named_entity} in a way that is neither supportive nor critical.
         NEGATIVE: Criticizes, highlights failures, or blames the {named_entity} for challenges or issues.
         Note: Focus your analysis strictly on the sentiment toward {named_entity} rather than the broader topic or context of the story. \n
-        Provide a single-word sentiment classification (POSITIVE, NEUTRAL, or NEGATIVE) followed by a colon, then a one to two sentence explanation supporting your assessment. 
+        Provide a single-word sentiment classification (POSITIVE, NEUTRAL, or NEGATIVE) followed by a colon, then a one to two sentence explanation supporting your assessment.
         If {named_entity} is not mentioned in the story, please reply with the phrase "NOT RELEVANT". Here is the story:
         """
 
     with st.expander("Sentiment label only"):
         f"""
         Analyze the sentiment of the following news story toward the {named_entity}. Focus on how the organization is portrayed using the following criteria to guide your analysis:\n
-        POSITIVE: Praises or highlights the {named_entity}'s achievements, contributions, or strengths. 
+        POSITIVE: Praises or highlights the {named_entity}'s achievements, contributions, or strengths.
         NEUTRAL: Provides balanced or factual coverage of the {named_entity} without clear positive or negative framing. Mentions the {named_entity} in a way that is neither supportive nor critical.
         NEGATIVE: Criticizes, highlights failures, or blames the {named_entity} for challenges or issues.
         Note: Focus your analysis strictly on the sentiment toward {named_entity} rather than the broader topic or context of the story. \n
