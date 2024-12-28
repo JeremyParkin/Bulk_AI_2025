@@ -15,11 +15,11 @@ st.set_page_config(page_title="MIG Bulk AI Analysis Tool",
                    page_icon="https://www.agilitypr.com/wp-content/uploads/2018/02/favicon-192.png",
                    layout="wide")
 
+# Set the current page in session state
 st.session_state.current_page = 'Configuration'
 
 # Sidebar configuration
 mig.standard_sidebar()
-
 
 # Initialize st.session_state.elapsed_time if it does not exist
 if 'elapsed_time' not in st.session_state:
@@ -27,28 +27,19 @@ if 'elapsed_time' not in st.session_state:
 
 def normalize_text(text):
     """Convert to lowercase, remove extra spaces, remove punctuation, etc."""
-    # Convert to string in case the input is not a string
-    text = str(text)
-    # Convert to lowercase
-    text = text.lower()
-    # Remove extra spaces from the beginning and end
-    text = text.strip()
-    # Replace multiple spaces with a single space
-    text = re.sub(r'\s+', ' ', text)
-    # Remove punctuation (optional)
-    text = text.translate(str.maketrans('', '', string.punctuation))
-    # Further normalization steps like stemming could be added here
+    text = str(text)     # Convert to string in case the input is not a string
+    text = text.lower()     # Convert to lowercase
+    text = text.strip()     # Remove extra spaces from the beginning and end
+    text = re.sub(r'\s+', ' ', text)     # Replace multiple spaces with a single space
+    text = text.translate(str.maketrans('', '', string.punctuation))     # Remove punctuation (optional)
     return text
 
 
 def remove_extra_spaces(text):
     """Remove extra spaces from the beginning and end of a string and replace multiple spaces with a single space."""
-    # Convert to string in case the input is not a string
-    text = str(text)
-    # Remove extra spaces from the beginning and end
-    text = text.strip()
-    # Replace multiple spaces with a single space
-    text = re.sub(r'\s+', ' ', text)
+    text = str(text)     # Convert to string in case the input is not a string
+    text = text.strip()     # Remove extra spaces from the beginning and end
+    text = re.sub(r'\s+', ' ', text)     # Replace multiple spaces with a single space
     return text
 
 
@@ -156,77 +147,26 @@ def cluster_by_media_type(df, similarity_threshold=0.92):
     return pd.concat(clustered_frames, ignore_index=True) if clustered_frames else df
 
 
-# def cluster_by_media_type(df, similarity_threshold=0.92):
-#     """Cluster stories by media type and ensure unique Group IDs across media types."""
-#     type_column = 'Media Type' if 'Media Type' in df.columns else 'Type'
-#
-#     # Identify unique media types
-#     unique_media_types = df[type_column].unique()
-#
-#     clustered_frames = []
-#     group_id_offset = 0  # Offset to ensure unique Group IDs across media types
-#
-#     for media_type in unique_media_types:
-#         st.write(f"Processing media type: {media_type}")
-#
-#         # Filter data for the current media type
-#         media_df = df[df[type_column] == media_type].copy()
-#
-#         if not media_df.empty:
-#             # Fill missing Headline/Snippet with empty strings
-#             media_df['Headline'] = media_df['Headline'].fillna("")
-#             media_df['Snippet'] = media_df['Snippet'].fillna("")
-#
-#             # Skip processing if all headlines and snippets are empty
-#             if media_df[['Headline', 'Snippet']].apply(lambda x: x.str.strip()).eq("").all(axis=None):
-#                 st.warning(f"Skipping media type {media_type} due to missing headlines and snippets.")
-#                 continue
-#
-#             # Normalize and clean text
-#             media_df['Normalized Headline'] = media_df['Headline'].apply(normalize_text)
-#             media_df['Normalized Snippet'] = media_df['Snippet'].apply(normalize_text)
-#
-#             # Cluster stories for this media type
-#             media_df = cluster_similar_stories(media_df, similarity_threshold=similarity_threshold)
-#
-#             # Offset Group IDs to make them unique
-#             media_df['Group ID'] += group_id_offset
-#             group_id_offset += media_df['Group ID'].max() + 1
-#
-#             # Drop normalized columns
-#             normalized_columns = [col for col in ['Normalized Headline', 'Normalized Snippet'] if
-#                                   col in media_df.columns]
-#             media_df = media_df.drop(columns=normalized_columns, errors='ignore')
-#
-#             clustered_frames.append(media_df)
-#
-#     # Combine all clustered frames
-#     return pd.concat(clustered_frames, ignore_index=True) if clustered_frames else df
-
 
 def assign_group_ids(duplicates):
     """Assign a group ID to each article based on the similarity matrix."""
     group_id = 0
     group_ids = {}
-
     for i, similar_indices in duplicates.items():
         if i not in group_ids:
             group_ids[i] = group_id
             for index in similar_indices:
                 group_ids[index] = group_id
             group_id += 1
-
     return group_ids
 
 
 def identify_duplicates(cluster_labels):  ## refactored for agg clustering
     """Group articles based on cluster labels."""
     from collections import defaultdict
-
     duplicates = defaultdict(list)
     for idx, label in enumerate(cluster_labels):
         duplicates[label].append(idx)
-
     return duplicates
 
 
@@ -239,8 +179,10 @@ def clean_snippet(snippet):
     else:
         return snippet
 
-
+# Main title of the page
 st.title("Configuration")
+
+# Check if the upload step is completed
 if not st.session_state.upload_step:
     st.error('Please upload a CSV/XLSX before trying this step.')
 
@@ -337,7 +279,6 @@ else:
             # Sort unique stories by group count
             unique_stories_sorted = unique_stories_with_counts.sort_values(by='Group Count',
                                                                            ascending=False).reset_index(drop=True)
-
             # Update session state
             st.session_state.unique_stories = unique_stories_sorted
 
@@ -345,7 +286,6 @@ else:
             end_time = time.time()
             st.session_state.elapsed_time = end_time - start_time
             st.rerun()
-
 
 
     else:
@@ -359,8 +299,8 @@ else:
 
 
         def reset_config():
+            """Reset the configuration step and related session state variables."""
             st.session_state.config_step = False
-            # Reset other relevant session state variables as needed
             st.session_state.sentiment_opinion = None
             st.session_state.random_sample = None
             st.session_state.similarity_threshold = None

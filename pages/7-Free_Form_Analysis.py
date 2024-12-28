@@ -103,23 +103,7 @@ else:
                     }
                 }
             ]
-            #
-            # functions = [
-            #     {
-            #         "name": "analyze_freeform",
-            #         "description": "Perform freeform analysis based on a user-defined prompt.",
-            #         "parameters": {
-            #             "type": "object",
-            #             "properties": {
-            #                 "analysis": {
-            #                     "type": "string",
-            #                     "description": "The result of the analysis based on the user's custom prompt."
-            #                 }
-            #             },
-            #             "required": ["analysis"]
-            #         }
-            #     }
-            # ]
+
 
 
             def analyze_story(row):
@@ -137,8 +121,6 @@ else:
                         function_call={"name": "analyze_freeform"}  # Explicitly call the function
                     )
 
-                    # Log the raw response for debugging
-                    # st.write(f"API Response: {response}")
 
                     if response.choices[0].message.function_call:
                         import json
@@ -174,13 +156,6 @@ else:
                                 st.session_state.unique_stories.loc[
                                     original_index, 'Freeform Analysis'] = f"Error: {result['error']}"
 
-                            # if "error" not in result:
-                            #     st.session_state.unique_stories.loc[original_index, 'Freeform Analysis'] = result[
-                            #         "analysis"]
-                            #     st.session_state.unique_stories.loc[original_index, 'FF_Processed'] = True
-                            # else:
-                            #     st.session_state.unique_stories.loc[
-                            #         original_index, 'Freeform Analysis'] = f"Error: {result['error']}"
 
                         with lock:
                             progress["completed"] += 1
@@ -191,76 +166,6 @@ else:
 
             # Ensure progress bar reaches 100%
             progress_bar.progress(1.0)
-
-            # def analyze_story(row):
-            #     snippet_column = "Coverage Snippet" if "Coverage Snippet" in unprocessed_df.columns else "Snippet"
-            #
-            #     full_prompt = f"{custom_prompt}\n\n{row['Headline']}. {row[snippet_column]}"
-            #     try:
-            #         response = client.chat.completions.create(
-            #             model=model,
-            #             messages=[
-            #                 {"role": "system", "content": "You are a highly knowledgeable media analysis AI."},
-            #                 {"role": "user", "content": full_prompt}
-            #             ]
-            #         )
-            #
-            #         # import json
-            #         # function_args = json.loads(response.choices[0].message.function_call.arguments)
-            #
-            #
-            #         if response is None:
-            #             return {"error": "No response received."}
-            #
-            #         with lock:
-            #             token_counts["input_tokens"] += response.usage.prompt_tokens
-            #             token_counts["output_tokens"] += response.usage.completion_tokens
-            #
-            #         return {
-            #             response
-            #         }
-            #     except Exception as e:
-            #         return {"error": str(e)}
-
-
-
-            # # Use ThreadPoolExecutor for parallel processing
-            # with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            #     futures = {executor.submit(analyze_story, row): idx for idx, row in unprocessed_df.iterrows()}
-            #     for future in as_completed(futures):
-            #         idx = futures[future]
-            #         try:
-            #             result = future.result()
-            #             original_index = unprocessed_df.loc[idx, 'index'] # Map back to the original index
-            #
-            #
-            #             if result is None:
-            #                 st.error("No response received.")
-            #                 continue
-            #
-            #
-            #             with lock: # Thread-safe updates
-            #                 if "error" not in result:
-            #                     st.session_state.unique_stories.loc[
-            #                         original_index, 'Freeform Analysis'] = result.choices[0].message.content.strip()
-            #                     st.session_state.unique_stories.loc[
-            #                         original_index, 'FF_Processed'] = True
-            #
-            #                 else:
-            #                     st.session_state.unique_stories.loc[
-            #                         original_index, 'Freeform Analysis'
-            #                     ] = f"Error: {result['error']}"
-            #
-            #             with lock:
-            #                 progress["completed"] += 1
-            #                 progress_bar.progress(progress["completed"] / len(unprocessed_df))
-            #
-            #         except Exception as exc:
-            #             st.error(f"An error occurred: {exc}")
-            #
-            #
-            #     # Ensure progress bar reaches 100%
-            #     progress_bar.progress(1.0)
 
 
             # Add the analysis results to the DataFrame
