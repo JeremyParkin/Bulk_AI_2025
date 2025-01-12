@@ -37,7 +37,7 @@ else:
     st.subheader("Sentiment Prompt Inputs")
 
     # Add input for named entity
-    named_entity = st.text_input("**Full brand name for analysis**, e.g. *the Canada Mortgage and Housing Corporation (CHMC)*:", "", help='Enter the full brand name for analysis, e.g. *the Canada Mortgage and Housing Corporation (CHMC)*. If appropriate, include "the" before it and/or a common acronym in parentheses after.')
+    named_entity = st.text_input("**Full brand name for analysis**, e.g. *the Canada Mortgage and Housing Corporation (CMHC)*:", "", help='Enter the full brand name for analysis, e.g. *the Canada Mortgage and Housing Corporation (CHMC)*. If appropriate, include "the" before it and/or a common acronym in parentheses after.')
     if named_entity.strip() == "":
         st.warning("Please enter a named entity for analysis.")
 
