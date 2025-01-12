@@ -6,7 +6,7 @@ import concurrent.futures
 from concurrent.futures import as_completed
 import time
 from threading import Lock
-
+import json
 
 # Initialize OpenAI client
 client = OpenAI(api_key=st.secrets["key"])
@@ -165,7 +165,6 @@ else:
                         function_call={"name": "analyze_sentiment"}  # Explicitly call the function
                     )
 
-                    import json
                     function_args = json.loads(response.choices[0].message.function_call.arguments)
 
                     # Update token counts
