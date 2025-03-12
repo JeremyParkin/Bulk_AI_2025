@@ -14,7 +14,7 @@ client = OpenAI(api_key=st.secrets["key"])
 # Set Streamlit configuration
 st.set_page_config(
     page_title="MIG Freeform Analysis Tool",
-    page_icon="https://www.agilitypr.com/wp-content/uploads/2018/02/favicon-192.png",
+    page_icon="https://www.agilitypr.com/wp-content/uploads/2025/01/favicon.png",
     layout="wide"
 )
 

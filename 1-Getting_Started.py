@@ -5,7 +5,7 @@ import mig_functions as mig
 
 # Set Streamlit configuration
 st.set_page_config(page_title="MIG Bulk AI Analysis App",
-                   page_icon="https://www.agilitypr.com/wp-content/uploads/2018/02/favicon-192.png",
+                   page_icon="https://www.agilitypr.com/wp-content/uploads/2025/01/favicon.png",
                    layout="wide")
 
 # Sidebar configuration
@@ -18,7 +18,8 @@ st.title("Getting Started")
 # Initialize Session State Variables
 string_vars = {'page': '1: Getting Started', 'sentiment_type': '3-way', 'client_name': '', 'focus': '',
                'model_choice': 'GPT-3.5', 'similarity_threshold': 0.95, 'counter': 0, 'analysis_note': '', 'group_ids':'',
-               'sample_size': 0, 'highlight_keyword':'', 'current_page': 'Getting Started', 'min_impressions': 0, 'min_domain_authority': 0,}
+               'sample_size': 0, 'highlight_keyword':'', 'current_page': 'Getting Started', 'min_impressions': 0, 'min_domain_authority': 0,
+               'pre_prompt':'','post_prompt':'','functions':'','sentiment_examples':''}
 
 for key, value in string_vars.items():
     if key not in st.session_state:
@@ -29,7 +30,7 @@ for _ in df_vars:
     if _ not in st.session_state:
         st.session_state[_] = pd.DataFrame()
 
-bool_vars = ['upload_step', 'config_step', 'sentiment_opinion', 'random_sample',]
+bool_vars = ['upload_step', 'config_step', 'sentiment_opinion', 'random_sample', 'toning_config_step']
 for _ in bool_vars:
     if _ not in st.session_state:
         st.session_state[_] = False

@@ -15,7 +15,7 @@ client = OpenAI(api_key=st.secrets["key"])
 # Set Streamlit configuration
 st.set_page_config(
     page_title="MIG Freeform Analysis Tool",
-    page_icon="https://www.agilitypr.com/wp-content/uploads/2018/02/favicon-192.png",
+    page_icon="https://www.agilitypr.com/wp-content/uploads/2025/01/favicon.png",
     layout="wide"
 )
 
@@ -258,8 +258,8 @@ else:
 
     with st.expander("Spokesperson finder"):
         f"""
-        Please analyze the following story to see if any {named_entity} spokespeople appear in it.
-        If yes, respond with the list of their full names separated by commas, and nothing else. If no, respond with just the word NO. Here is the story:
+        Please analyze the following story to see if any {named_entity} representatives or spokespeople appear in it.
+        If yes, respond only with the list of their names separated by commas. If no, respond with just the word NO. Here is the story:
         """
 
 
@@ -272,10 +272,10 @@ else:
 
     with st.expander("Sentiment & rationale"):
         f"""
-        Analyze the sentiment of the following news story toward the {named_entity}. Focus on how the organization is portrayed using the following criteria to guide your analysis:\n
-        POSITIVE: Praises or highlights the {named_entity}'s achievements, contributions, or strengths.
-        NEUTRAL: Provides balanced or factual coverage of the {named_entity} without clear positive or negative framing. Mentions the {named_entity} in a way that is neither supportive nor critical.
-        NEGATIVE: Criticizes, highlights failures, or blames the {named_entity} for challenges or issues.
+        Analyze the sentiment of the following news story toward {named_entity}. Focus on how the organization is portrayed using the following criteria to guide your analysis:\n
+        POSITIVE: Praises or highlights {named_entity}'s achievements, contributions, or strengths.
+        NEUTRAL: Provides balanced or factual coverage of {named_entity} without clear positive or negative framing. Mentions {named_entity} in a way that is neither supportive nor critical.
+        NEGATIVE: Criticizes, highlights failures, or blames {named_entity} for challenges or issues.
         Note: Focus your analysis strictly on the sentiment toward {named_entity} rather than the broader topic or context of the story. \n
         Provide a single-word sentiment classification (POSITIVE, NEUTRAL, or NEGATIVE) followed by a colon, then a one to two sentence explanation supporting your assessment.
         If {named_entity} is not mentioned in the story, please reply with the phrase "NOT RELEVANT". Here is the story:
@@ -283,10 +283,10 @@ else:
 
     with st.expander("Sentiment label only"):
         f"""
-        Analyze the sentiment of the following news story toward the {named_entity}. Focus on how the organization is portrayed using the following criteria to guide your analysis:\n
-        POSITIVE: Praises or highlights the {named_entity}'s achievements, contributions, or strengths.
-        NEUTRAL: Provides balanced or factual coverage of the {named_entity} without clear positive or negative framing. Mentions the {named_entity} in a way that is neither supportive nor critical.
-        NEGATIVE: Criticizes, highlights failures, or blames the {named_entity} for challenges or issues.
+        Analyze the sentiment of the following news story toward {named_entity}. Focus on how the organization is portrayed using the following criteria to guide your analysis:\n
+        POSITIVE: Praises or highlights {named_entity}'s achievements, contributions, or strengths.
+        NEUTRAL: Provides balanced or factual coverage of {named_entity} without clear positive or negative framing. Mentions {named_entity} in a way that is neither supportive nor critical.
+        NEGATIVE: Criticizes, highlights failures, or blames {named_entity} for challenges or issues.
         Note: Focus your analysis strictly on the sentiment toward {named_entity} rather than the broader topic or context of the story. \n
         Provide only a single-word sentiment classification: POSITIVE, NEUTRAL, NEGATIVE, or NOT RELEVANT (if {named_entity} is not mentioned in the story.
         Here is the story:
@@ -294,7 +294,7 @@ else:
 
     with st.expander("Junk checker"):
         f"""
-        Analyze the following news story or broadcast transcript to determine the type of coverage for the {named_entity}. Your response should be a single label from the following categories:\n
+        Analyze the following news story or broadcast transcript to determine the type of coverage for {named_entity}. Your response should be a single label from the following categories:\n
          - Press Release – The content appears to be directly from a press release or promotional material.\n
          - Advertisement – The brand mention is part of an advertisement or sponsored content.\n
          - Legitimate News – The brand is mentioned within a genuine news story or editorial context.\n
