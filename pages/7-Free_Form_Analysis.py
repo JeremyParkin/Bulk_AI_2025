@@ -270,33 +270,37 @@ else:
         If yes, respond with the list of topic names separated by commas, and nothing else. If no, respond with just the word NO. Here is the story:
         """
 
-    with st.expander("Sentiment & rationale"):
-        f"""
-        Analyze the sentiment of the following news story toward {named_entity}. Focus on how the organization is portrayed using the following criteria to guide your analysis:\n
-        POSITIVE: Praises or highlights {named_entity}'s achievements, contributions, or strengths.
-        NEUTRAL: Provides balanced or factual coverage of {named_entity} without clear positive or negative framing. Mentions {named_entity} in a way that is neither supportive nor critical.
-        NEGATIVE: Criticizes, highlights failures, or blames {named_entity} for challenges or issues.
-        Note: Focus your analysis strictly on the sentiment toward {named_entity} rather than the broader topic or context of the story. \n
-        Provide a single-word sentiment classification (POSITIVE, NEUTRAL, or NEGATIVE) followed by a colon, then a one to two sentence explanation supporting your assessment.
-        If {named_entity} is not mentioned in the story, please reply with the phrase "NOT RELEVANT". Here is the story:
-        """
-
-    with st.expander("Sentiment label only"):
-        f"""
-        Analyze the sentiment of the following news story toward {named_entity}. Focus on how the organization is portrayed using the following criteria to guide your analysis:\n
-        POSITIVE: Praises or highlights {named_entity}'s achievements, contributions, or strengths.
-        NEUTRAL: Provides balanced or factual coverage of {named_entity} without clear positive or negative framing. Mentions {named_entity} in a way that is neither supportive nor critical.
-        NEGATIVE: Criticizes, highlights failures, or blames {named_entity} for challenges or issues.
-        Note: Focus your analysis strictly on the sentiment toward {named_entity} rather than the broader topic or context of the story. \n
-        Provide only a single-word sentiment classification: POSITIVE, NEUTRAL, NEGATIVE, or NOT RELEVANT (if {named_entity} is not mentioned in the story.
-        Here is the story:
-        """
+    # with st.expander("Sentiment & rationale"):
+    #     f"""
+    #     Analyze the sentiment of the following news story toward {named_entity}. Focus on how the organization is portrayed using the following criteria to guide your analysis:\n
+    #     POSITIVE: Praises or highlights {named_entity}'s achievements, contributions, or strengths.
+    #     NEUTRAL: Provides balanced or factual coverage of {named_entity} without clear positive or negative framing. Mentions {named_entity} in a way that is neither supportive nor critical.
+    #     NEGATIVE: Criticizes, highlights failures, or blames {named_entity} for challenges or issues.
+    #     Note: Focus your analysis strictly on the sentiment toward {named_entity} rather than the broader topic or context of the story. \n
+    #     Provide a single-word sentiment classification (POSITIVE, NEUTRAL, or NEGATIVE) followed by a colon, then a one to two sentence explanation supporting your assessment.
+    #     If {named_entity} is not mentioned in the story, please reply with the phrase "NOT RELEVANT". Here is the story:
+    #     """
+    #
+    # with st.expander("Sentiment label only"):
+    #     f"""
+    #     Analyze the sentiment of the following news story toward {named_entity}. Focus on how the organization is portrayed using the following criteria to guide your analysis:\n
+    #     POSITIVE: Praises or highlights {named_entity}'s achievements, contributions, or strengths.
+    #     NEUTRAL: Provides balanced or factual coverage of {named_entity} without clear positive or negative framing. Mentions {named_entity} in a way that is neither supportive nor critical.
+    #     NEGATIVE: Criticizes, highlights failures, or blames {named_entity} for challenges or issues.
+    #     Note: Focus your analysis strictly on the sentiment toward {named_entity} rather than the broader topic or context of the story. \n
+    #     Provide only a single-word sentiment classification: POSITIVE, NEUTRAL, NEGATIVE, or NOT RELEVANT (if {named_entity} is not mentioned in the story.
+    #     Here is the story:
+    #     """
 
     with st.expander("Junk checker"):
         f"""
-        Analyze the following news story or broadcast transcript to determine the type of coverage for {named_entity}. Your response should be a single label from the following categories:\n
-         - Press Release – The content appears to be directly from a press release or promotional material.\n
-         - Advertisement – The brand mention is part of an advertisement or sponsored content.\n
-         - Legitimate News – The brand is mentioned within a genuine news story or editorial context.\n
-         Reply with only the category label that best fits the coverage.
+        Analyze the following news story or broadcast transcript to determine the type of coverage for [BRAND]. Your response should be a single label from the following categories:
+        •Press Release – The content appears to be directly from a press release or promotional material.
+        •Advertisement – The brand mention is part of an advertisement or sponsored content.
+        •Event Listing / Calendar Notice – A public announcement of an event where the brand is mentioned but not discussed further.
+        •Stock Market Update – A brief stock price update with no meaningful discussion of the company.
+        •Job Posting – The content is a recruitment ad mentioning the brand in an employment context.
+        •Incidental Bio Mention – The brand is mentioned only in a person’s biography or background information, such as an author’s credentials or a public figure’s past employment history, without any discussion or relevance to the brand in the story itself.
+        •Legitimate News – The brand is discussed within a genuine news story or editorial context.
+        Reply with only the category label that best fits the coverage. Here is the story:
         """
