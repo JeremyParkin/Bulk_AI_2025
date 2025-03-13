@@ -17,6 +17,10 @@ def standard_sidebar():
                             .st-emotion-cache-1cypcdb {
                                 max-width: 250px !important;
                                 }
+                            .e1wa958q1 {
+                                filter: brightness(2000%);
+                            }
+                            
                             </style>
                             """
     # Inject CSS with Markdown
