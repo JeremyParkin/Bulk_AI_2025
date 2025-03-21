@@ -214,10 +214,21 @@ else:
             st.write(f"Calculated sample size: {st.session_state.sample_size}")
 
         elif sampling_option == 'Set my own sample size':
+            max_sample = len(st.session_state.full_dataset)
+
             custom_sample_size = st.number_input(
                 "Enter your desired sample size:",
-                min_value=1, max_value=len(st.session_state.full_dataset), step=1, value=400
+                min_value=1,
+                max_value=max_sample,
+                step=1,
+                value=min(400, max_sample)
             )
+
+            #
+            # custom_sample_size = st.number_input(
+            #     "Enter your desired sample size:",
+            #     min_value=1, max_value=len(st.session_state.full_dataset), step=1, value=400
+            # )
             st.session_state.sample_size = int(custom_sample_size)
 
         else:
