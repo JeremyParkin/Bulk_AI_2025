@@ -61,7 +61,13 @@ else:
 
     # Inputs for start row and batch size
     start_row = 0
-    row_limit = st.number_input("Batch size (0 for all remaining rows):", min_value=0, value=5, step=1)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        row_limit = st.number_input("Batch size (0 for all remaining rows):", min_value=0, value=5, step=1)
+
+    with col2:
+        model = st.selectbox("Select Model", ["gpt-4.1", "gpt-4.1-mini", "gpt-4o"], help="GPT-4.1 is recommended for most tasks. GPT-4.1-mini is a smaller model with lower cost and faster response time, but may be less accurate. gpt-4o was preferred before but has been surpassed.")
 
     # Filter unprocessed rows
     unprocessed_df = st.session_state.unique_stories[~st.session_state.unique_stories["Processed"]]
@@ -156,7 +162,7 @@ else:
 
                 try:
                     response = client.chat.completions.create(
-                        model="gpt-4.1",
+                        model=model,
                         messages=[
                             {"role": "system", "content": "You are a highly knowledgeable media analysis AI."},
                             {"role": "user", "content": full_prompt}
@@ -227,9 +233,28 @@ else:
             # Calculate and display costs
             total_input_tokens = token_counts['input_tokens']
             total_output_tokens = token_counts['output_tokens']
-            input_cost = (total_input_tokens / 1_000_000) * 2.0  # Cost for input tokens
-            output_cost = (total_output_tokens / 1_000_000) * 8  # Cost for output tokens
+
+            if model == "gpt-4o":
+                input_cost = (total_input_tokens / 1_000_000) * 2.50  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 10  # Cost for output tokens
+
+            elif model == "gpt-4.1":
+                input_cost = (total_input_tokens / 1_000_000) * 2.0  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 8  # Cost for output tokens
+
+            elif model == "gpt-4.1-mini":
+                input_cost = (total_input_tokens / 1_000_000) * 0.40  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 1.60  # Cost for output tokens
+
+            else:
+                input_cost = (total_input_tokens / 1_000_000) * 0.15  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 0.60  # Cost for output tokens
             total_cost = input_cost + output_cost
+
+
+            # input_cost = (total_input_tokens / 1_000_000) * 2.0  # Cost for input tokens
+            # output_cost = (total_output_tokens / 1_000_000) * 8  # Cost for output tokens
+            # total_cost = input_cost + output_cost
 
             st.markdown(
                 f"**Cost for Input Tokens:** USD\${input_cost:.4f} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Cost for Output Tokens:** USD\${output_cost:.4f}",
