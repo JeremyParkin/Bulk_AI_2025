@@ -156,7 +156,7 @@ else:
 
                 try:
                     response = client.chat.completions.create(
-                        model="gpt-4o",
+                        model="gpt-4.1",
                         messages=[
                             {"role": "system", "content": "You are a highly knowledgeable media analysis AI."},
                             {"role": "user", "content": full_prompt}
@@ -227,8 +227,8 @@ else:
             # Calculate and display costs
             total_input_tokens = token_counts['input_tokens']
             total_output_tokens = token_counts['output_tokens']
-            input_cost = (total_input_tokens / 1_000_000) * 2.50  # Cost for input tokens
-            output_cost = (total_output_tokens / 1_000_000) * 10  # Cost for output tokens
+            input_cost = (total_input_tokens / 1_000_000) * 2.0  # Cost for input tokens
+            output_cost = (total_output_tokens / 1_000_000) * 8  # Cost for output tokens
             total_cost = input_cost + output_cost
 
             st.markdown(
