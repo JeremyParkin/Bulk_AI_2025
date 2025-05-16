@@ -66,7 +66,7 @@ else:
 
 
     with col2:
-        model = st.selectbox("Select Model", ["gpt-4o-mini", "gpt-4o"])
+        model = st.selectbox("Select Model", ["gpt-4.1-mini", "gpt-4.1", "gpt-4o-mini", "gpt-4o"])
 
     if st.button("Analyze Stories", type='primary'):
         if not custom_prompt:
@@ -206,6 +206,15 @@ else:
             if model == "gpt-4o":
                 input_cost = (total_input_tokens / 1_000_000) * 2.50  # Cost for input tokens
                 output_cost = (total_output_tokens / 1_000_000) * 10  # Cost for output tokens
+
+            if model == "gpt-4.1":
+                input_cost = (total_input_tokens / 1_000_000) * 2.0  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 8  # Cost for output tokens
+
+            if model == "gpt-4.1-mini":
+                input_cost = (total_input_tokens / 1_000_000) * 0.40  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 1.60  # Cost for output tokens
+
             else:
                 input_cost = (total_input_tokens / 1_000_000) * 0.15  # Cost for input tokens
                 output_cost = (total_output_tokens / 1_000_000) * 0.60  # Cost for output tokens
