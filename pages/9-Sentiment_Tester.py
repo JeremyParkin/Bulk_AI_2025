@@ -361,31 +361,33 @@ else:
         # st.subheader("Summary Table")
         st.table(st.session_state.summary_df)
 
-    # Add button to reset processed state
+        st.subheader("Detailed Comparison Table")
+        df_full = st.session_state.unique_stories.copy()
+        df_full = df_full[df_full["AI Sentiment"].notna()]
+        df_full["Sentiment_Upper"] = df_full["Sentiment"].str.upper().str.strip()
+        df_full["AI_Sentiment_Upper"] = df_full["AI Sentiment"].str.upper().str.strip()
+        df_full["Match"] = df_full["Sentiment_Upper"] == df_full["AI_Sentiment_Upper"]
+
+        cols_to_show = [
+            "Group ID", "Headline", "Sentiment", "AI Sentiment",
+            "Match", "AI Sentiment Rationale", "Group Count", "URL", "Snippet"
+        ]
+
+        if st.checkbox("Show mismatches only"):
+            df_filtered = df_full[df_full["Match"] == False]
+        else:
+            df_filtered = df_full
+
+        st.dataframe(df_filtered[cols_to_show].reset_index(drop=True), hide_index=True)
+
+        # Add button to reset processed state
     if st.button("Reset Processed Rows"):
         st.session_state.unique_stories["Processed"] = False
         st.session_state.unique_stories['AI Sentiment'] = None
         st.session_state.unique_stories['AI Sentiment Rationale'] = None
         st.session_state.df_traditional['AI Sentiment'] = None
         st.session_state.df_traditional['AI Sentiment Rationale'] = None
+        st.session_state.pop("summary_df", None)
+
         st.success("Reset all rows to unprocessed state.")
-
-    st.subheader("Detailed Comparison Table")
-    df_full = st.session_state.unique_stories.copy()
-    df_full = df_full[df_full["AI Sentiment"].notna()]
-    df_full["Sentiment_Upper"] = df_full["Sentiment"].str.upper().str.strip()
-    df_full["AI_Sentiment_Upper"] = df_full["AI Sentiment"].str.upper().str.strip()
-    df_full["Match"] = df_full["Sentiment_Upper"] == df_full["AI_Sentiment_Upper"]
-
-    cols_to_show = [
-        "Group ID", "Headline", "Sentiment", "AI Sentiment",
-        "Match", "AI Sentiment Rationale", "Group Count", "URL", "Snippet"
-    ]
-
-    if st.checkbox("Show mismatches only"):
-        df_filtered = df_full[df_full["Match"] == False]
-    else:
-        df_filtered = df_full
-
-    st.dataframe(df_filtered[cols_to_show].reset_index(drop=True), hide_index=True)
-
+        st.rerun()
