@@ -32,7 +32,8 @@ elif not st.session_state.config_step:
 
 else:
     st.info(
-        "This page will generate three new columns: 'AI Sentiment', 'AI Sentiment Confidence', and 'AI Sentiment Rationale'.")
+        "Generate AI sentiment analysis for news stories about a specific named entity based on the headline and full text of the story."
+    )
 
     st.subheader("Sentiment Prompt Inputs")
 

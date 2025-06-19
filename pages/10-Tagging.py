@@ -19,7 +19,10 @@ st.set_page_config(
 )
 
 st.title("AI Tagging Tool")
-st.header("EXPERIMENTAL - use with caution")
+st.warning("EXPERIMENTAL - use with caution")
+st.info(
+        "Generate AI tagging analysis for news stories based on the headline and full text of the story."
+    )
 
 client_name = st.session_state.client_name
 
