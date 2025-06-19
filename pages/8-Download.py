@@ -143,8 +143,6 @@ else:
 
     with st.expander('View Processed Data'):
         st.dataframe(st.session_state.df_traditional)
-        # st.dataframe(st.session_state.df_traditional.loc[:,
-        #              ~st.session_state.df_traditional.columns.isin(["FF_Processed", "Processed"])])
 
 
     traditional = st.session_state.df_traditional
@@ -226,5 +224,5 @@ else:
 
     # Check if the download data is ready and display the download button
     if st.session_state.download_data is not None:
-        export_name = f"{st.session_state.client_name} - {st.session_state.focus} - Sentiment.xlsx"
+        export_name = f"{st.session_state.client_name} - {st.session_state.focus} - BulkAI.xlsx"
         st.download_button('Download', st.session_state.download_data, file_name=export_name, type="primary")

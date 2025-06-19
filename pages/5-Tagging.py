@@ -218,12 +218,39 @@ Snippet: {row[snippet_column]}
 
     st.write(f"**Total Cost:** USD${cost:.4f}")
 
+    # Cascade AI tags back to df_traditional using Group ID
+    tag_cols_to_copy = [col for col in st.session_state.unique_stories.columns if col.startswith("AI Tag")]
+
+    for _, row in st.session_state.unique_stories.iterrows():
+        st.session_state.df_traditional.loc[
+            st.session_state.df_traditional['Group ID'] == row['Group ID'],
+            tag_cols_to_copy
+        ] = row[tag_cols_to_copy].values
+
+
+
 # Reset
 if st.button("Reset Processed Rows"):
     st.session_state.unique_stories["Processed"] = False
-    tag_columns_to_drop = [col for col in st.session_state.unique_stories.columns if col.startswith("AI Tag")]
-    st.session_state.unique_stories.drop(columns=tag_columns_to_drop, inplace=True)
-    st.success("All AI tag columns removed and rows marked unprocessed.")
+
+    # Find AI Tag columns in unique_stories
+    tag_columns_us = [col for col in st.session_state.unique_stories.columns if col.startswith("AI Tag")]
+    st.session_state.unique_stories.drop(columns=tag_columns_us, inplace=True)
+
+    # Find and drop same columns from df_traditional, if they exist
+    tag_columns_dt = [col for col in st.session_state.df_traditional.columns if col.startswith("AI Tag")]
+    st.session_state.df_traditional.drop(columns=tag_columns_dt, inplace=True)
+
+    st.success("All AI tag columns dropped from both dataframes and rows marked unprocessed.")
+
+
+
+
+# if st.button("Reset Processed Rows"):
+#     st.session_state.unique_stories["Processed"] = False
+#     tag_columns_to_drop = [col for col in st.session_state.unique_stories.columns if col.startswith("AI Tag")]
+#     st.session_state.unique_stories.drop(columns=tag_columns_to_drop, inplace=True)
+#     st.success("All AI tag columns removed and rows marked unprocessed.")
 
 with st.expander("Unique Stories"):
     st.dataframe(st.session_state.unique_stories)
