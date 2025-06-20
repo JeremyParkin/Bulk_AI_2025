@@ -13,13 +13,13 @@ client = OpenAI(api_key=st.secrets["key"])
 
 # Set Streamlit config
 st.set_page_config(
-    page_title="AI Content Tagger",
+    page_title="AI Tagging",
     page_icon="https://www.agilitypr.com/wp-content/uploads/2025/01/favicon.png",
     layout="wide"
 )
 
-st.title("AI Tagging Tool")
-st.warning("EXPERIMENTAL - use with caution")
+st.title("AI Tagging")
+st.warning("EXPERIMENTAL: use with caution")
 st.info(
         "Generate AI tagging analysis for news stories based on the headline and full text of the story."
     )

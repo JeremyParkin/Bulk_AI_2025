@@ -14,12 +14,12 @@ client = OpenAI(api_key=st.secrets["key"])
 
 # Set Streamlit configuration
 st.set_page_config(
-    page_title="MIG Freeform Analysis Tool",
+    page_title="AI Freeform Analysis",
     page_icon="https://www.agilitypr.com/wp-content/uploads/2025/01/favicon.png",
     layout="wide"
 )
 
-st.title("MIG Freeform Analysis")
+st.title("AI Freeform Analysis")
 
 if not st.session_state.upload_step:
     st.error('Please upload a CSV/XLSX before trying this step.')

@@ -6,7 +6,7 @@ import altair as alt
 
 
 # Set Streamlit configuration
-st.set_page_config(page_title="MIG Sentiment Tool",
+st.set_page_config(page_title="MIG Bulk AI Analysis",
                    page_icon="https://www.agilitypr.com/wp-content/uploads/2025/01/favicon.png",
                    layout="wide")
 

@@ -20,7 +20,7 @@ st.set_page_config(
 
 
 # Main title of the page
-st.title("AI Sentiment Analysis")
+st.title("AI Sentiment Analysis Tester")
 
 # Check if the upload step is complete
 if not st.session_state.upload_step:
