@@ -41,7 +41,7 @@ elif not st.session_state.config_step:
 # Tagging configuration inputs (no longer inside a form)
 st.write("**Define Tags and Criteria**")
 tags_text = st.text_area(
-    "One per line, in the format: TagName: Criteria",
+    "One per line, in the format: TagName: Criteria", height=200,
     value=(
         f"Sustainability: {client_name} is discussed in relation to environmental responsibility, green initiatives, or emissions reduction\n"
         f"Innovation: {client_name} is discussed in relation to new technology, unique approaches, or product breakthroughs\n"
