@@ -7,6 +7,7 @@ from concurrent.futures import as_completed
 import time
 from threading import Lock
 import json
+import re
 
 # Initialize OpenAI client
 client = OpenAI(api_key=st.secrets["key"])
@@ -34,6 +35,10 @@ st.session_state.setdefault("tag_definitions", {})
 st.session_state.setdefault("tagging_mode", "Single best tag")
 st.session_state.setdefault("tags_text", tag_text_placeholder)
 
+
+def clean_text(text):
+    # Remove invisible Unicode characters and extra whitespace
+    return re.sub(r'[\u200B-\u200D\uFEFF\u202A-\u202E]', '', text).strip()
 
 # Upload & config checks
 if not st.session_state.upload_step:
@@ -73,11 +78,19 @@ st.write(f"Selected Stories for Analysis: {len(unprocessed_df)}")
 # Apply Tags
 if st.button("Apply Tags", type='primary'):
 
+    # tag_definitions = {}
+    # for line in tags_text.strip().splitlines():
+    #     if ':' in line:
+    #         tag, criteria = line.split(':', 1)
+    #         tag_definitions[tag.strip()] = criteria.strip()
+
     tag_definitions = {}
     for line in tags_text.strip().splitlines():
         if ':' in line:
             tag, criteria = line.split(':', 1)
-            tag_definitions[tag.strip()] = criteria.strip()
+            cleaned_tag = clean_text(tag)
+            cleaned_criteria = clean_text(criteria)
+            tag_definitions[cleaned_tag] = cleaned_criteria
 
     st.session_state['tag_definitions'] = tag_definitions
     st.session_state['tagging_mode'] = tagging_mode
@@ -188,7 +201,7 @@ Snippet: {row[snippet_column]}
                 result = future.result()
                 with lock:
                     if "error" not in result:
-                        st.session_state.unique_stories.loc[original_index, "Tag Processed"] = True
+                        st.session_state.unique_stories.loc[original_index, "Tag_Processed"] = True
 
                         if tagging_mode == "Single best tag":
                             tag = result["tag"]
@@ -241,7 +254,7 @@ Snippet: {row[snippet_column]}
 
 # Reset
 if st.button("Reset Processed Rows"):
-    st.session_state.unique_stories["Tag Processed"] = False
+    st.session_state.unique_stories["Tag_Processed"] = False
 
     # Find AI Tag columns in unique_stories
     tag_columns_us = [col for col in st.session_state.unique_stories.columns if col.startswith("AI Tag")]
