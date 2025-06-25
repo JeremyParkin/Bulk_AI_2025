@@ -318,6 +318,7 @@ else:
             st.session_state.sentiment_instruction = None
             st.session_state.df_traditional = st.session_state.full_dataset.copy()
             st.session_state.counter = 0
+            st.session_state.pop('unique_stories', None)
 
 
         # Add reset button
