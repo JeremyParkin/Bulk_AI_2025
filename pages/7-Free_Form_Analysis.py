@@ -4,7 +4,7 @@ import openai
 import io
 import concurrent.futures
 from concurrent.futures import as_completed
-
+import mig_functions as mig
 from openai import OpenAI
 import time
 from threading import Lock
@@ -18,6 +18,9 @@ st.set_page_config(
     page_icon="https://www.agilitypr.com/wp-content/uploads/2025/01/favicon.png",
     layout="wide"
 )
+
+# Sidebar configuration
+mig.standard_sidebar()
 
 st.title("AI Freeform Analysis")
 

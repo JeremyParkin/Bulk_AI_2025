@@ -4,6 +4,7 @@ import openai
 from openai import OpenAI
 import concurrent.futures
 from concurrent.futures import as_completed
+import mig_functions as mig
 import time
 from threading import Lock
 import json
@@ -18,6 +19,8 @@ st.set_page_config(
     layout="wide"
 )
 
+# Sidebar configuration
+mig.standard_sidebar()
 
 # Main title of the page
 st.title("AI Sentiment Analysis Tester")

@@ -4,6 +4,7 @@ import openai
 from openai import OpenAI
 import concurrent.futures
 from concurrent.futures import as_completed
+import mig_functions as mig
 import time
 from threading import Lock
 import json
@@ -21,6 +22,8 @@ st.set_page_config(
 
 st.title("AI Tagging")
 
+# Sidebar configuration
+mig.standard_sidebar()
 
 client_name = st.session_state.client_name
 
