@@ -62,8 +62,9 @@ tags_text = st.text_area(
 )
 
 tagging_mode = st.radio("Tagging Mode", ["Single best tag", "Multiple applicable tags"])
-model = st.selectbox("Select Model", ["gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano"])
-
+# model = st.selectbox("Select Model", ["gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano"])
+model = st.selectbox("Select Model", ["gpt-5-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4o", "gpt-5", "gpt-5-nano"],
+                     help="GPT-5-mini is recommended for most tasks.")
 
 # Target data
 start_row = 0
@@ -241,6 +242,15 @@ Snippet: {row[snippet_column]}
         cost = (in_tokens / 1_000_000) * 0.40 + (out_tokens / 1_000_000) * 1.60
     elif model == "gpt-4.1-nano":
         cost = (in_tokens / 1_000_000) * 0.20 + (out_tokens / 1_000_000) * 0.80
+    elif model == "gpt-5":
+        cost = (in_tokens / 1_000_000) * 1.25 + (out_tokens / 1_000_000) * 10
+    elif model == "gpt-5-mini":
+        cost = (in_tokens / 1_000_000) * 0.25 + (out_tokens / 1_000_000) * 2
+    elif model == "gpt-5-nano":
+        cost = (in_tokens / 1_000_000) * 0.05 + (out_tokens / 1_000_000) * 0.40
+
+
+
 
     st.write(f"**Total Cost:** USD${cost:.4f}")
 

@@ -69,8 +69,9 @@ else:
 
 
     with col2:
-        model = st.selectbox("Select Model", ["gpt-4.1-mini", "gpt-4.1", "gpt-4o-mini", "gpt-4o"])
-
+        # model = st.selectbox("Select Model", ["gpt-4.1-mini", "gpt-4.1", "gpt-4o-mini", "gpt-4o"])
+        model = st.selectbox("Select Model", ["gpt-5-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4o", "gpt-5", "gpt-5-nano"],
+                             help="GPT-5-mini is recommended for most tasks.")
     if st.button("Analyze Stories", type='primary'):
         if not custom_prompt:
             st.error("Please enter a custom prompt before proceeding.")
@@ -210,13 +211,25 @@ else:
                 input_cost = (total_input_tokens / 1_000_000) * 2.50  # Cost for input tokens
                 output_cost = (total_output_tokens / 1_000_000) * 10  # Cost for output tokens
 
-            if model == "gpt-4.1":
+            elif model == "gpt-4.1":
                 input_cost = (total_input_tokens / 1_000_000) * 2.0  # Cost for input tokens
                 output_cost = (total_output_tokens / 1_000_000) * 8  # Cost for output tokens
 
-            if model == "gpt-4.1-mini":
+            elif model == "gpt-4.1-mini":
                 input_cost = (total_input_tokens / 1_000_000) * 0.40  # Cost for input tokens
                 output_cost = (total_output_tokens / 1_000_000) * 1.60  # Cost for output tokens
+
+            elif model == "gpt-5":
+                input_cost = (total_input_tokens / 1_000_000) * 1.25  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 10  # Cost for output tokens
+
+            elif model == "gpt-5-mini":
+                input_cost = (total_input_tokens / 1_000_000) * 0.25  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 2  # Cost for output tokens
+
+            elif model == "gpt-5-nano":
+                input_cost = (total_input_tokens / 1_000_000) * 0.05  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 0.40  # Cost for output tokens
 
             else:
                 input_cost = (total_input_tokens / 1_000_000) * 0.15  # Cost for input tokens

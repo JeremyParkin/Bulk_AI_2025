@@ -71,7 +71,7 @@ else:
         row_limit = st.number_input("Batch size (0 for all remaining rows):", min_value=0, value=5, step=1)
 
     with col2:
-        model = st.selectbox("Select Model", ["gpt-4.1", "gpt-4.1-mini", "gpt-4o"], help="GPT-4.1 is recommended for most tasks. GPT-4.1-mini is a smaller model with lower cost and faster response time, but may be less accurate. gpt-4o was preferred before but has been surpassed.")
+        model = st.selectbox("Select Model", ["gpt-5-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4o", "gpt-5", "gpt-5-nano"], help="GPT-5-mini is recommended for most tasks.")
 
     # Filter unprocessed rows
     unprocessed_df = st.session_state.unique_stories[~st.session_state.unique_stories["Processed"]]
@@ -249,6 +249,18 @@ else:
             elif model == "gpt-4.1-mini":
                 input_cost = (total_input_tokens / 1_000_000) * 0.40  # Cost for input tokens
                 output_cost = (total_output_tokens / 1_000_000) * 1.60  # Cost for output tokens
+
+            elif model == "gpt-5":
+                input_cost = (total_input_tokens / 1_000_000) * 1.25  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 10  # Cost for output tokens
+
+            elif model == "gpt-5-mini":
+                input_cost = (total_input_tokens / 1_000_000) * 0.25  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 2  # Cost for output tokens
+
+            elif model == "gpt-5-nano":
+                input_cost = (total_input_tokens / 1_000_000) * 0.05  # Cost for input tokens
+                output_cost = (total_output_tokens / 1_000_000) * 0.40  # Cost for output tokens
 
             else:
                 input_cost = (total_input_tokens / 1_000_000) * 0.15  # Cost for input tokens
