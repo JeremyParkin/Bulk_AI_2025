@@ -168,8 +168,20 @@ else:
                 number_format = workbook.add_format({'num_format': '#,##0'})
                 currency_format = workbook.add_format({'num_format': '$#,##0'})
 
+                # if len(traditional) > 0:
+                #     traditional = traditional.sort_values(by=['Impressions'], ascending=False)
+                #     traditional.to_excel(writer, sheet_name='CLEAN TRAD', startrow=1, header=False, index=False)
+                #     worksheet1 = writer.sheets['CLEAN TRAD']
+                #     worksheet1.set_tab_color('black')
+                #
+                #     (max_row, max_col) = traditional.shape
+                #     column_settings = [{'header': column} for column in traditional.columns]
+                #     worksheet1.add_table(0, 0, max_row, max_col - 1, {'columns': column_settings})
+
                 if len(traditional) > 0:
-                    traditional = traditional.sort_values(by=['Impressions'], ascending=False)
+                    if 'Impressions' in traditional.columns:
+                        traditional = traditional.sort_values(by=['Impressions'], ascending=False)
+
                     traditional.to_excel(writer, sheet_name='CLEAN TRAD', startrow=1, header=False, index=False)
                     worksheet1 = writer.sheets['CLEAN TRAD']
                     worksheet1.set_tab_color('black')
