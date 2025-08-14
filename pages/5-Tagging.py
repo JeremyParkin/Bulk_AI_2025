@@ -82,11 +82,7 @@ st.write(f"Selected Stories for Analysis: {len(unprocessed_df)}")
 # Apply Tags
 if st.button("Apply Tags", type='primary'):
 
-    # tag_definitions = {}
-    # for line in tags_text.strip().splitlines():
-    #     if ':' in line:
-    #         tag, criteria = line.split(':', 1)
-    #         tag_definitions[tag.strip()] = criteria.strip()
+
 
     tag_definitions = {}
     for line in tags_text.strip().splitlines():
