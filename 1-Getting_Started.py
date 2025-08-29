@@ -57,7 +57,7 @@ if not st.session_state.upload_step:
                            help='Required to build export file name.')
     focus = st.text_input('Reporting period or focus*', placeholder='eg. March 2022', key='period',
                           help='Required to build export file name.')
-    uploaded_file = st.file_uploader(label='Upload your CSV or XLSX*', type=['csv', 'xlsx'],
+    uploaded_file = st.file_uploader(label='Upload your CSV or XLSX*', type=['csv', 'xlsx'], max_size=290,
                                      accept_multiple_files=False,
                                      )
 
@@ -94,7 +94,12 @@ if not st.session_state.upload_step:
             st.session_state.client_name = client
             st.session_state.focus = focus
             st.session_state.full_dataset = st.session_state.df_traditional.copy()
-            st.session_state.df_traditional.rename(columns={"Coverage Snippet": "Snippet"}, inplace=True)
+            st.session_state.df_traditional.rename(columns={
+                "Coverage Snippet": "Snippet",
+                "Content": "Snippet",
+                "Network": "Type",
+                "Title": "Headline"
+            }, inplace=True)
 
 
             st.session_state.upload_step = True
