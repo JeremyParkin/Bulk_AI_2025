@@ -57,7 +57,7 @@ if not st.session_state.upload_step:
                            help='Required to build export file name.')
     focus = st.text_input('Reporting period or focus*', placeholder='eg. March 2022', key='period',
                           help='Required to build export file name.')
-    uploaded_file = st.file_uploader(label='Upload your CSV or XLSX*', type=['csv', 'xlsx'], max_size=270,
+    uploaded_file = st.file_uploader(label='Upload your CSV or XLSX*', type=['csv', 'xlsx'],
                                      accept_multiple_files=False,
                                      )
 
