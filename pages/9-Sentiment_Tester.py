@@ -73,7 +73,7 @@ else:
 
     with col2:
         # model = st.selectbox("Select Model", ["gpt-4.1", "gpt-4.1-mini", "gpt-4o"], help="GPT-4.1 is recommended for most tasks. GPT-4.1-mini is a smaller model with lower cost and faster response time, but may be less accurate. gpt-4o was preferred before but has been surpassed.")
-        model = st.selectbox("Select Model", ["gpt-5-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4o", "gpt-5", "gpt-5-nano"],
+        model = st.selectbox("Select Model", ["gpt-5-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4o", "gpt-5-nano"],
                              help="GPT-5-mini is recommended for most tasks.")
     # Filter unprocessed rows
     unprocessed_df = st.session_state.unique_stories[~st.session_state.unique_stories["Processed"]]
