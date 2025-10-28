@@ -70,7 +70,7 @@ else:
 
     with col2:
         # model = st.selectbox("Select Model", ["gpt-4.1-mini", "gpt-4.1", "gpt-4o-mini", "gpt-4o"])
-        model = st.selectbox("Select Model", ["gpt-5-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4o", "gpt-5-nano"],
+        model = st.selectbox("Select Model", ["gpt-5-mini", "gpt-4.1-mini", "gpt-5-nano"],
                              help="GPT-5-mini is recommended for most tasks.")
     if st.button("Analyze Stories", type='primary'):
         if not custom_prompt:
