@@ -71,7 +71,7 @@ else:
         row_limit = st.number_input("Batch size (0 for all remaining rows):", min_value=0, value=5, step=1)
 
     with col2:
-        model = st.selectbox("Select Model", ["gpt-5-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4o", "gpt-5-nano"], help="GPT-5-mini is recommended for most tasks.")
+        model = st.selectbox("Select Model", ["gpt-5-mini", "gpt-4.1-mini", "gpt-5-nano"], help="GPT-5-mini is recommended for most tasks.")
 
     # Filter unprocessed rows
     unprocessed_df = st.session_state.unique_stories[~st.session_state.unique_stories["Processed"]]
