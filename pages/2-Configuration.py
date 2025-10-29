@@ -259,7 +259,7 @@ else:
             st.session_state.sample_size = len(st.session_state.full_dataset)
             st.write(f"Full data size: {st.session_state.sample_size}")
 
-        similarity_threshold = 0.93
+        similarity_threshold = 0.932
         st.session_state.similarity_threshold = similarity_threshold
 
         if st.button("Save Configuration", type="primary"):
