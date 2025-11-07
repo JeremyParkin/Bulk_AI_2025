@@ -1,8 +1,8 @@
-streamlit~=1.41.0
-pandas~=2.2.3
-openai~=1.57.4
+streamlit~=1.51.0
+pandas~=2.3.3
+openai~=1.6.1
 openpyxl~=3.1.2
-XlsxWriter~=3.2.0
-scikit-learn~=1.5.2
+XlsxWriter~=3.2.9
+scikit-learn~=1.7.2
 streamlit-tags~=1.2.8
 
