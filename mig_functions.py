@@ -1,6 +1,8 @@
 def standard_sidebar():
     import streamlit as st
-    st.sidebar.image('https://app.agilitypr.com/app/assets/images/agility-logo-vertical.png', width=180)
+    st.sidebar.image('https://jeremyparkin.com/wp-content/uploads/2025/05/AG_main-light-grey.png', width=180)
+
+    # st.sidebar.image('https://app.agilitypr.com/app/assets/images/agility-logo-vertical.png', width=180)
     st.sidebar.subheader('MIG Bulk AI Analysis App')
     st.sidebar.caption("Version: Nov 2025")
 
