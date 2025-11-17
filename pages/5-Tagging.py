@@ -214,7 +214,7 @@ Snippet: {row[snippet_column]}
                             st.session_state.unique_stories.loc[original_index, "AI Tag Rationale"] = rationale
                         else:
                             st.session_state.unique_stories.loc[original_index, "AI Tags"] = ", ".join(result["tags"])
-                            st.session_state.unique_stories.loc[original_index, "AI Tag Rationales"] = " | ".join(result["explanations"])
+                            st.session_state.unique_stories.loc[original_index, "AI Tag Rationale"] = " | ".join(result["explanations"])
                             for tag in tag_definitions.keys():
                                 col = f"AI Tag: {tag}"
                                 st.session_state.unique_stories.loc[original_index, col] = 1 if tag in result["tags"] else 0
