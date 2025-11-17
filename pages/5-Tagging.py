@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import openai
 from openai import OpenAI
 import concurrent.futures
 from concurrent.futures import as_completed
