@@ -237,7 +237,7 @@ else:
             total_cost = input_cost + output_cost
 
             st.markdown(
-                f"**Cost for Input Tokens:** USD\${input_cost:.4f} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Cost for Output Tokens:** USD\${output_cost:.4f}",
+                f"**Cost for Input Tokens:** USD${input_cost:.4f} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Cost for Output Tokens:** USD${output_cost:.4f}",
                 unsafe_allow_html=True
             )
             st.write(f"**Total Cost:** USD${total_cost:.4f}")
