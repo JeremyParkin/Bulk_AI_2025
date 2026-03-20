@@ -61,7 +61,7 @@ tags_text = st.text_area(
 )
 
 tagging_mode = st.radio("Tagging Mode", ["Single best tag", "Multiple applicable tags"])
-model = st.selectbox("Select Model", ["gpt-5.4-nano", "gpt-5-mini", "gpt-4.1-mini", ],
+model = st.selectbox("Select Model", ["gpt-5.4-nano", "gpt-4.1-mini", ],
                      help="GPT-5.4-nano is recommended for most tasks.")
 
 # Target data
