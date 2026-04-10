@@ -236,7 +236,7 @@ Snippet: {row[snippet_column]}
     elif model == "gpt-5-mini":
         cost = (in_tokens / 1_000_000) * 0.25 + (out_tokens / 1_000_000) * 2
     elif model == "gpt-5.4-nano":
-        cost == (in_tokens / 1_000_000) * 0.20 + (out_tokens / 1_000_000) * 0.125
+        cost = (in_tokens / 1_000_000) * 0.20 + (out_tokens / 1_000_000) * 0.125
 
 
 
